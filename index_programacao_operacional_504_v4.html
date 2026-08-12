@@ -1,0 +1,2273 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Programação Operacional 504 | V4</title>
+<style>
+:root{
+  --bg:#0b1220; --panel:#111b2e; --panel2:#16233a; --line:#263650;
+  --text:#eef4ff; --muted:#9fb0c7; --green:#4ade80; --yellow:#facc15;
+  --orange:#fb923c; --red:#fb7185; --blue:#38bdf8; --purple:#c084fc;
+  --shadow:0 14px 38px rgba(0,0,0,.24); --radius:18px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(180deg,#07101d 0%,#0b1220 35%,#0e1726 100%);
+  color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.app{min-height:100vh}
+.header{position:sticky;top:0;z-index:10;backdrop-filter:blur(14px);
+  background:rgba(7,16,29,.86);border-bottom:1px solid rgba(255,255,255,.07)}
+.header-inner{max-width:1500px;margin:auto;padding:14px 20px;display:flex;gap:16px;align-items:center;justify-content:space-between}
+.brand{display:flex;gap:12px;align-items:center}
+.logo{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-weight:900;color:#08111f;
+  background:linear-gradient(135deg,var(--green),var(--blue))}
+.brand h1{font-size:18px;margin:0}.brand small{display:block;color:var(--muted);margin-top:3px}
+.header-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.btn{border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:10px 13px;border-radius:12px;font-weight:700}
+.btn:hover{filter:brightness(1.08)} .btn.primary{background:linear-gradient(135deg,#16a34a,#0ea5e9);border:none}
+.btn.danger{background:#3a1720;border-color:#662032}.btn.ghost{background:transparent}
+.main{max-width:1500px;margin:auto;padding:18px 20px 48px}
+.tabs{display:flex;gap:8px;overflow:auto;padding-bottom:10px;margin-bottom:8px}
+.tab{white-space:nowrap;border:1px solid var(--line);background:#0d1728;color:var(--muted);padding:10px 14px;border-radius:12px;font-weight:800}
+.tab.active{background:#1b2a43;color:white;border-color:#3a5073}
+.page{display:none}.page.active{display:block}
+.hero{display:flex;gap:18px;align-items:flex-end;justify-content:space-between;margin:14px 0 18px}
+.hero h2{margin:0 0 6px;font-size:28px}.hero p{margin:0;color:var(--muted)}
+.chip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:#101c30;padding:8px 10px;border-radius:999px;color:var(--muted);font-weight:700}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--green)}
+.grid-kpi{display:grid;grid-template-columns:repeat(6,minmax(150px,1fr));gap:12px}
+.card{background:linear-gradient(180deg,rgba(22,35,58,.96),rgba(14,24,41,.96));border:1px solid var(--line);
+  border-radius:var(--radius);box-shadow:var(--shadow)}
+.kpi{padding:16px}.kpi .label{color:var(--muted);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em}
+.kpi .value{font-size:30px;font-weight:900;margin-top:6px}.kpi .sub{color:var(--muted);font-size:12px;margin-top:4px}
+.kpi.good .value{color:var(--green)}.kpi.warn .value{color:var(--yellow)}.kpi.bad .value{color:var(--red)}
+.grid-2{display:grid;grid-template-columns:1.1fr .9fr;gap:14px;margin-top:14px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}
+.section{padding:18px}.section h3{margin:0 0 13px;font-size:16px}
+.section-sub{color:var(--muted);font-size:13px;margin:-6px 0 14px}
+.table-wrap{overflow:auto;border-radius:14px;border:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;min-width:760px}
+th,td{padding:11px 12px;border-bottom:1px solid rgba(255,255,255,.06);text-align:left;font-size:13px;vertical-align:middle}
+th{position:sticky;top:0;background:#16233a;color:#b9c8db;font-size:11px;text-transform:uppercase;letter-spacing:.05em;z-index:1}
+tr:hover td{background:rgba(255,255,255,.02)}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:5px 8px;border-radius:999px;font-size:11px;font-weight:900;border:1px solid transparent}
+.badge.green{background:rgba(74,222,128,.12);color:#86efac;border-color:rgba(74,222,128,.25)}
+.badge.red{background:rgba(251,113,133,.12);color:#fda4af;border-color:rgba(251,113,133,.25)}
+.badge.yellow{background:rgba(250,204,21,.12);color:#fde047;border-color:rgba(250,204,21,.25)}
+.badge.blue{background:rgba(56,189,248,.12);color:#7dd3fc;border-color:rgba(56,189,248,.25)}
+.badge.gray{background:rgba(159,176,199,.1);color:#c7d3e1;border-color:rgba(159,176,199,.2)}
+.badge.orange{background:rgba(251,146,60,.12);color:#fdba74;border-color:rgba(251,146,60,.25)}
+.filters{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:12px}
+.input,.select,.textarea{border:1px solid var(--line);background:#0b1628;color:var(--text);border-radius:11px;padding:10px 11px;outline:none}
+.input:focus,.select:focus,.textarea:focus{border-color:#3b82f6}
+.input{min-width:190px}.select{min-width:160px}
+.textarea{width:100%;min-height:260px;resize:vertical;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;line-height:1.5}
+.bar-row{display:grid;grid-template-columns:165px 1fr 56px;gap:10px;align-items:center;margin:10px 0}
+.bar-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:#dbe7f6}
+.bar{height:10px;border-radius:999px;background:#0a1423;overflow:hidden;border:1px solid rgba(255,255,255,.04)}
+.bar > i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#22c55e,#38bdf8)}
+.bar-val{text-align:right;font-size:12px;font-weight:900}
+.alerts{display:grid;gap:9px}.alert{display:flex;justify-content:space-between;gap:14px;padding:12px 13px;border:1px solid var(--line);border-radius:13px;background:#0d1829}
+.alert strong{font-size:13px}.alert small{color:var(--muted)}
+.alert .n{font-size:18px;font-weight:900}.alert.red .n{color:var(--red)}.alert.yellow .n{color:var(--yellow)}.alert.blue .n{color:var(--blue)}
+.empty{padding:30px;text-align:center;color:var(--muted)}
+.operator-card{padding:16px;border:1px solid var(--line);border-radius:15px;background:#0d1829}
+.operator-card h4{margin:0 0 6px}.operator-meta{display:flex;gap:7px;flex-wrap:wrap;color:var(--muted);font-size:12px}
+.operator-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}
+.performance-card{position:relative;overflow:hidden;min-height:218px;display:flex;flex-direction:column;gap:12px}
+.performance-card::before{content:"";position:absolute;inset:0 auto 0 0;width:4px;background:linear-gradient(180deg,var(--green),var(--blue))}
+.performance-card.has-late::before{background:linear-gradient(180deg,var(--red),var(--orange))}
+.performance-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.performance-name{font-size:15px;font-weight:900;line-height:1.25;padding-left:4px}
+.performance-status{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:5px;padding-left:4px}
+.operator-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+.operator-stat{padding:9px 7px;border-radius:11px;background:#101e33;border:1px solid rgba(255,255,255,.05);text-align:center}
+.operator-stat .n{display:block;font-size:21px;font-weight:900;line-height:1.1}.operator-stat .l{display:block;color:var(--muted);font-size:10px;margin-top:4px;text-transform:uppercase;font-weight:800}
+.operator-stat.exec .n{color:var(--green)}.operator-stat.pending .n{color:var(--yellow)}.operator-stat.late .n{color:var(--red)}
+.performance-foot{margin-top:auto;display:flex;gap:9px;align-items:center;justify-content:space-between}
+.execution-ring{min-width:58px;text-align:right;font-size:18px;font-weight:900}.execution-ring small{display:block;font-size:9px;color:var(--muted);font-weight:700;margin-top:2px}
+.performance-progress{flex:1}.performance-progress .bar{height:8px;margin-top:5px}
+.performance-progress small{font-size:10px;color:var(--muted)}
+.mini-btn{border:1px solid var(--line);background:#13233b;color:#dcecff;border-radius:9px;padding:7px 9px;font-size:10px;font-weight:900}
+.mini-btn:hover{filter:brightness(1.12)}
+.order-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:11px}
+.order-card{padding:15px;border:1px solid var(--line);border-radius:15px;background:#0d1829}
+.order-card h4{margin:4px 0 8px;font-size:14px}.order-card .desc{color:#d8e2ef;font-size:13px;line-height:1.4;min-height:36px}
+.order-card footer{display:flex;justify-content:space-between;gap:8px;margin-top:12px;color:var(--muted);font-size:11px}
+.machine-map{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.machine-group{padding:15px;border-radius:16px;border:1px solid var(--line);background:#0d1829}
+.machine-group h4{margin:0 0 4px}.machine-group small{color:var(--muted)}
+.machine-list{margin:11px 0 0;padding:0;list-style:none;display:grid;gap:7px}.machine-list li{padding:8px 9px;border-radius:10px;background:#101e33;font-size:12px}
+.filebox{border:1px dashed #48607f;border-radius:15px;padding:14px;background:#0c1728}
+.note{padding:12px 13px;border-radius:13px;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.22);color:#cfeeff;font-size:13px;line-height:1.5}
+.warn-note{background:rgba(250,204,21,.08);border-color:rgba(250,204,21,.22);color:#fff4b0}
+.small{font-size:12px;color:var(--muted)}
+hr.sep{border:0;border-top:1px solid var(--line);margin:16px 0}
+.config-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.inline-select{background:#0b1628;color:var(--text);border:1px solid var(--line);border-radius:9px;padding:7px 8px}
+.code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:11px;color:#a7c7ed}
+.footer-note{color:#7890ad;font-size:11px;margin-top:18px;text-align:center}
+
+.base-toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin-bottom:12px}
+.status-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border-radius:999px;font-size:11px;font-weight:900}
+.status-pill.active{background:rgba(74,222,128,.12);color:#86efac;border:1px solid rgba(74,222,128,.25)}
+.status-pill.vacation{background:rgba(250,204,21,.12);color:#fde047;border:1px solid rgba(250,204,21,.25)}
+.status-pill.other{background:rgba(159,176,199,.10);color:#c7d3e1;border:1px solid rgba(159,176,199,.2)}
+.delta{font-weight:900}.delta.good{color:var(--green)}.delta.bad{color:var(--red)}.delta.neutral{color:var(--muted)}
+.month-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.month-stat{padding:12px;border:1px solid var(--line);border-radius:13px;background:#0d1829}
+.month-stat strong{display:block;font-size:22px;margin-top:4px}.month-stat small{color:var(--muted)}
+.history-row{display:grid;grid-template-columns:110px 1fr 76px 76px;gap:10px;align-items:center;margin:10px 0}
+.history-label{font-size:12px;font-weight:800}.history-meta{text-align:right;font-size:12px;color:var(--muted)}
+.add-operator{display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:8px;align-items:end}
+@media(max-width:900px){.add-operator{grid-template-columns:1fr 1fr}.add-operator .btn{grid-column:1/-1}.history-row{grid-template-columns:88px 1fr 52px 52px}}
+
+@media(max-width:1100px){
+  .grid-kpi{grid-template-columns:repeat(3,1fr)}.grid-2,.grid-3,.config-grid{grid-template-columns:1fr}
+  .machine-map{grid-template-columns:repeat(2,1fr)}.operator-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:700px){
+  .operator-stats{grid-template-columns:repeat(2,1fr)}
+  .header-inner{align-items:flex-start;flex-direction:column}.grid-kpi{grid-template-columns:repeat(2,1fr)}
+  .machine-map,.operator-grid,.order-cards{grid-template-columns:1fr}.hero{align-items:flex-start;flex-direction:column}
+  .kpi .value{font-size:26px}.main{padding:14px 12px 36px}.header-inner{padding:12px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="header">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="logo">504</div>
+        <div><h1>Programação Operacional</h1><small>Linha 504 • Gestão de Ordens SAP</small></div>
+      </div>
+      <div class="header-actions">
+        <button class="btn ghost" onclick="downloadBackup()">Exportar backup</button>
+        <button class="btn" onclick="loadDemo(false)">Carregar base SAP • 95 ordens</button>
+        <button class="btn danger" onclick="clearData()">Limpar dados</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="tabs">
+      <button class="tab active" data-page="dashboard">Dashboard</button>
+      <button class="tab" data-page="programacao">Programação Geral</button>
+      <button class="tab" data-page="minha">Minha Semana</button>
+      <button class="tab" data-page="desempenho">Desempenho Operadores</button>
+      <button class="tab" data-page="operadores">Base Operacional</button>
+      <button class="tab" data-page="historico">Histórico / Evolução</button>
+      <button class="tab" data-page="config">Configuração</button>
+      <button class="tab" data-page="importar">Importar SAP</button>
+    </div>
+
+    <section id="dashboard" class="page active">
+      <div class="hero">
+        <div>
+          <h2>Visão geral da programação</h2>
+          <p>Execução confirmada pelo SAP usando o token <b>CONF</b> no Status sistema.</p>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end"><div class="chip"><span class="dot"></span><b>Base: 95 ordens SAP</b></div><div class="chip"><span class="dot"></span><span id="lastUpdate">Sem importação</span></div></div>
+      </div>
+
+      <div class="filters" style="margin-top:-4px">
+        <select id="dashMonth" class="select" onchange="renderDashboard()"></select>
+        <select id="dashCompare" class="select" onchange="renderDashboard()"></select>
+      </div>
+
+      <div class="grid-kpi">
+        <div class="card kpi good"><div class="label">Execução</div><div class="value" id="kExec">0%</div><div class="sub" id="kExecSub">0 de 0</div></div>
+        <div class="card kpi"><div class="label">Ordens</div><div class="value" id="kTotal">0</div><div class="sub" id="kTotalSub">da competência</div></div>
+        <div class="card kpi warn"><div class="label">Pendentes</div><div class="value" id="kPending">0</div><div class="sub" id="kPendingSub">sem CONF no SAP</div></div>
+        <div class="card kpi bad"><div class="label">Atrasadas</div><div class="value" id="kLate">0</div><div class="sub" id="kLateSub">data vencida e sem CONF</div></div>
+        <div class="card kpi"><div class="label">Sem responsável</div><div class="value" id="kNoOwner">0</div><div class="sub">equipamento sem mapeamento</div></div>
+        <div class="card kpi"><div class="label">Críticas pendentes</div><div class="value" id="kCritical">0</div><div class="sub">tipos 300 / 302 / 306</div></div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card section">
+          <h3>Execução por célula</h3>
+          <div id="cellBars"></div>
+        </div>
+        <div class="card section">
+          <h3>Atenção necessária</h3>
+          <div class="alerts" id="alerts"></div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card section">
+          <h3>Equipamentos com menor aderência</h3>
+          <div id="machineBars"></div>
+        </div>
+        <div class="card section">
+          <h3>Operadores com pendências</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Operador</th><th>Grupo</th><th>Prog.</th><th>Exec.</th><th>Atras.</th><th>%</th></tr></thead>
+              <tbody id="operatorDebt"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="card section" style="margin-top:14px">
+        <h3>Atividades críticas pendentes</h3>
+        <div class="section-sub">300 e 306 = troca mandatória • 302 = plano de lubrificação</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Ordem</th><th>Data</th><th>Equipamento</th><th>Atividade</th><th>Responsável</th><th>Status</th></tr></thead>
+            <tbody id="criticalTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="programacao" class="page">
+      <div class="hero">
+        <div><h2>Programação Geral</h2><p>Base única de ordens, responsáveis, semana e situação.</p></div>
+      </div>
+      <div class="filters">
+        <input id="fSearch" class="input" placeholder="Buscar ordem, equipamento, texto..." oninput="renderProgramacao()">
+        <select id="fMonth" class="select" onchange="renderProgramacao()"></select>
+        <select id="fCell" class="select" onchange="renderProgramacao()">
+          <option value="">Todas as células</option><option value="1">Célula 1</option><option value="2">Célula 2</option><option value="3">Célula 3</option><option value="0">Não mapeado</option>
+        </select>
+        <select id="fStatus" class="select" onchange="renderProgramacao()">
+          <option value="">Todos os status</option><option value="executada">Executada</option><option value="pendente">Pendente</option><option value="atrasada">Atrasada</option><option value="sem_responsavel">Sem responsável</option>
+        </select>
+        <select id="fGroup" class="select" onchange="renderProgramacao()">
+          <option value="">Todos os grupos</option><option value="Frente">Frente</option><option value="LGF">LGF</option><option value="Meio">Meio</option><option value="Fundo">Fundo</option><option value="A definir">A definir</option>
+        </select>
+      </div>
+      <div class="card section">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Ordem</th><th>Data-base</th><th>Semana</th><th>Equipamento</th><th>Célula</th><th>Grupo</th><th>Responsável</th><th>Tipo</th><th>Descrição</th><th>Status</th></tr></thead>
+            <tbody id="programTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="minha" class="page">
+      <div class="hero">
+        <div><h2>Minha Semana</h2><p>Simulação da visão individual do operador. Na versão com login, o operador será identificado automaticamente.</p></div>
+      </div>
+      <div class="filters">
+        <select id="myOperator" class="select" onchange="renderMinhaSemana()"></select>
+        <select id="myWeek" class="select" onchange="renderMinhaSemana()"></select>
+      </div>
+      <div class="grid-kpi" style="grid-template-columns:repeat(4,minmax(150px,1fr))">
+        <div class="card kpi"><div class="label">Programadas</div><div class="value" id="myTotal">0</div></div>
+        <div class="card kpi good"><div class="label">Executadas</div><div class="value" id="myExec">0</div></div>
+        <div class="card kpi warn"><div class="label">Pendentes</div><div class="value" id="myPending">0</div></div>
+        <div class="card kpi bad"><div class="label">Atrasadas</div><div class="value" id="myLate">0</div></div>
+      </div>
+      <div class="order-cards" id="myCards" style="margin-top:14px"></div>
+    </section>
+
+    <section id="desempenho" class="page">
+      <div class="hero">
+        <div><h2>Desempenho dos operadores</h2><p>Cards individuais com ordens programadas, executadas, pendentes e atrasadas.</p></div>
+        <div class="chip"><span class="dot"></span><span id="perfPeriodLabel">Competência atual</span></div>
+      </div>
+      <div class="filters">
+        <select id="perfMonth" class="select" onchange="renderOperatorPerformance()"></select>
+        <select id="perfShift" class="select" onchange="renderOperatorPerformance()"><option value="">Todos os turnos</option><option>1º Turno</option><option>2º Turno</option><option>3º Turno</option><option>A definir</option></select>
+        <select id="perfGroup" class="select" onchange="renderOperatorPerformance()"><option value="">Todas as células/grupos</option><option>Frente</option><option>LGF</option><option>Meio</option><option>Fundo</option></select>
+        <select id="perfStatus" class="select" onchange="renderOperatorPerformance()"><option value="">Ativos e férias</option><option value="Ativo">Ativos</option><option value="Férias">Férias</option></select>
+        <select id="perfSort" class="select" onchange="renderOperatorPerformance()"><option value="late">Mais atrasadas</option><option value="exec">Mais executadas</option><option value="pct">Maior execução %</option><option value="name">Nome A–Z</option></select>
+      </div>
+      <div class="operator-grid" id="performanceOperatorGrid"></div>
+    </section>
+
+    <section id="operadores" class="page">
+      <div class="hero">
+        <div><h2>Base Operacional</h2><p>Cadastro temporário para alimentar a programação até a integração com o Portal Gente.</p></div>
+      </div>
+
+      <div class="grid-kpi" style="grid-template-columns:repeat(4,minmax(150px,1fr));margin-bottom:14px">
+        <div class="card kpi good"><div class="label">Disponíveis</div><div class="value" id="opActive">0</div><div class="sub">entram na distribuição</div></div>
+        <div class="card kpi warn"><div class="label">Férias</div><div class="value" id="opVacation">0</div><div class="sub">fora da base disponível</div></div>
+        <div class="card kpi"><div class="label">Turno a definir</div><div class="value" id="opNoShift">0</div><div class="sub">cadastro incompleto</div></div>
+        <div class="card kpi"><div class="label">Total cadastrado</div><div class="value" id="opTotal">0</div><div class="sub">histórico preservado</div></div>
+      </div>
+
+      <div class="card section">
+        <h3>Operadores</h3>
+        <div class="section-sub">Ao marcar <b>Férias</b>, o operador deixa de receber novas ordens e as pendentes podem ser redistribuídas. Ordens já executadas continuam no histórico.</div>
+        <div class="base-toolbar">
+          <select id="opShiftFilter" class="select" onchange="renderOperationalBase()"><option value="">Todos os turnos</option><option>1º Turno</option><option>2º Turno</option><option>3º Turno</option><option>A definir</option></select>
+          <select id="opGroupFilter" class="select" onchange="renderOperationalBase()"><option value="">Todas as células/grupos</option><option>Frente</option><option>LGF</option><option>Meio</option><option>Fundo</option></select>
+          <select id="opStatusFilter" class="select" onchange="renderOperationalBase()"><option value="">Todos os status</option><option value="Ativo">Ativo</option><option value="Férias">Férias</option></select>
+          <input id="opSearch" class="input" placeholder="Buscar operador..." oninput="renderOperationalBase()">
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Operador</th><th>Turno</th><th>Grupo</th><th>Célula</th><th>Status</th><th>Ordens</th><th>Execução</th></tr></thead>
+            <tbody id="operatorBaseTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card section" style="margin-top:14px">
+        <h3>Adicionar operador</h3>
+        <div class="add-operator">
+          <div><div class="small">Nome</div><input id="newOpName" class="input" style="width:100%" placeholder="Nome do operador"></div>
+          <div><div class="small">Turno</div><select id="newOpShift" class="select" style="width:100%"><option>1º Turno</option><option>2º Turno</option><option>3º Turno</option><option selected>A definir</option></select></div>
+          <div><div class="small">Grupo</div><select id="newOpGroup" class="select" style="width:100%"><option>Frente</option><option>LGF</option><option>Meio</option><option>Fundo</option></select></div>
+          <div><div class="small">Status</div><select id="newOpStatus" class="select" style="width:100%"><option>Ativo</option><option>Férias</option></select></div>
+          <button class="btn primary" onclick="addOperator()">Adicionar</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="historico" class="page">
+      <div class="hero">
+        <div><h2>Histórico e evolução mensal</h2><p>Os meses são criados automaticamente pela data das ordens importadas do SAP.</p></div>
+      </div>
+      <div class="grid-kpi" style="grid-template-columns:repeat(4,minmax(150px,1fr))">
+        <div class="card kpi"><div class="label">Meses na base</div><div class="value" id="hMonths">0</div><div class="sub">competências disponíveis</div></div>
+        <div class="card kpi"><div class="label">Ordens históricas</div><div class="value" id="hOrders">0</div><div class="sub">sem duplicar pela ordem</div></div>
+        <div class="card kpi good"><div class="label">Confirmadas</div><div class="value" id="hExec">0</div><div class="sub">status atual SAP</div></div>
+        <div class="card kpi warn"><div class="label">Backlog atual</div><div class="value" id="hBacklog">0</div><div class="sub">sem CONF</div></div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card section">
+          <h3>Evolução por competência</h3>
+          <div class="section-sub">A barra mostra a % das ordens daquela competência que estão confirmadas hoje.</div>
+          <div id="historyBars"></div>
+        </div>
+        <div class="card section">
+          <h3>Atualizações SAP</h3>
+          <div class="section-sub">Histórico das importações feitas neste navegador.</div>
+          <div class="table-wrap"><table><thead><tr><th>Data</th><th>Lidas</th><th>Novas</th><th>Atualizadas</th><th>CONF detectadas</th></tr></thead><tbody id="importHistoryTable"></tbody></table></div>
+        </div>
+      </div>
+
+      <div class="card section" style="margin-top:14px">
+        <h3>Comparativo mensal</h3>
+        <div class="table-wrap"><table><thead><tr><th>Mês</th><th>Ordens da competência</th><th>Confirmadas atualmente</th><th>Pendentes</th><th>Atrasadas</th><th>Aderência</th></tr></thead><tbody id="monthHistoryTable"></tbody></table></div>
+      </div>
+      <div class="note" style="margin-top:14px"><b>Importante:</b> o relatório atual do SAP informa a data-base da ordem e o status atual. Por isso o comparativo mensal mede as ordens originadas em cada competência e a situação delas hoje. A partir desta versão, o portal também registra quando uma mudança para <span class="code">CONF</span> é detectada em uma importação futura.</div>
+    </section>
+
+    <section id="config" class="page">
+      <div class="hero">
+        <div><h2>Configuração</h2><p>Mapa de máquinas e grupos usados pelo motor de programação automática.</p></div>
+      </div>
+      <div class="machine-map" id="machineMap"></div>
+
+      <div class="config-grid" style="margin-top:14px">
+        <div class="card section">
+          <h3>Equipamentos identificados na base</h3>
+          <div class="section-sub">Se aparecer uma máquina nova ou transporte diferente, você pode mapear aqui.</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Equipamento</th><th>Grupo</th><th>Célula</th></tr></thead>
+              <tbody id="machineConfig"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card section">
+          <h3>Regras do motor</h3>
+          <div class="note">
+            <b>1.</b> A ordem é a chave única.<br>
+            <b>2.</b> <span class="code">CONF</span> no Status sistema = executada.<br>
+            <b>3.</b> A semana é calculada pela Data-base início (segunda a domingo).<br>
+            <b>4.</b> O sistema distribui as ordens entre operadores <b>ativos</b> do mesmo grupo, equilibrando a carga por semana.<br>
+            <b>5.</b> Operador em <b>Férias</b> sai da base disponível, mas permanece no histórico das ordens executadas.<br>
+            <b>6.</b> Os meses são criados automaticamente pela Data-base da ordem.<br>
+            <b>7.</b> Uma atualização do SAP nunca apaga o histórico já registrado.
+          </div>
+          <hr class="sep">
+          <div class="warn-note note">
+            <b>Paletizadora 2 (cartão)</b> é apenas a identificação da Paletizadora 2. Não existe uma máquina separada chamada “Carton”.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="importar" class="page">
+      <div class="hero">
+        <div><h2>Importar relatório SAP</h2><p>Importe diretamente o HTM/HTML exportado pelo SAP ou cole a tabela do Excel.</p></div>
+      </div>
+      <div class="grid-2">
+        <div class="card section">
+          <h3>Arquivo HTM do SAP</h3>
+          <div class="section-sub">Agora você pode selecionar diretamente o arquivo .htm/.html exportado pelo SAP. O sistema lê a tabela e atualiza as ordens pela chave Ordem.</div>
+          <div class="filebox">
+            <input id="sapHtmlFile" class="input" style="width:100%;max-width:none" type="file" accept=".htm,.html,text/html">
+            <div class="filters" style="margin-top:10px;margin-bottom:0">
+              <button class="btn primary" onclick="importSapHtmlFile()">Importar HTM / HTML</button>
+              <button class="btn" onclick="previewSapHtmlFile()">Pré-visualizar HTM</button>
+            </div>
+          </div>
+          <hr class="sep">
+          <h3>Ou colar do Excel</h3>
+          <div class="section-sub">Também aceita dados separados por TAB (copiar/colar direto do Excel) ou ponto e vírgula.</div>
+          <textarea id="pasteArea" class="textarea" placeholder="Ordem[TAB]Tp.[TAB]InícioBase[TAB]Texto breve[TAB]Local de instalação[TAB]CenTrabPr.[TAB]TAM[TAB]StatUsuár.[TAB]Status do sistema"></textarea>
+          <div class="filters" style="margin-top:10px;margin-bottom:0">
+            <button class="btn primary" onclick="importFromPaste()">Importar / Atualizar</button>
+            <button class="btn" onclick="previewPaste()">Pré-visualizar</button>
+          </div>
+        </div>
+        <div class="card section">
+          <h3>Como funciona</h3>
+          <div class="note">
+            Você pode usar o mesmo relatório de atualização do SAP. Se a ordem <b>já existir</b>, o sistema atualiza o status e demais campos SAP. Se a ordem <b>não existir</b>, ela é cadastrada e entra na programação.
+          </div>
+          <hr class="sep">
+          <div class="small">
+            Cabeçalhos reconhecidos incluem os do relatório SAP: <b>Ordem</b>, <b>Tp.</b>, <b>InícioBase</b>, <b>Texto breve</b>, <b>Local de instalação</b>, <b>CenTrabPr.</b>, <b>TAM</b>, <b>StatUsuár.</b> e <b>Status do sistema</b>, além dos equivalentes da planilha de gestão.
+          </div>
+          <hr class="sep">
+          <div id="importResult" class="small">Nenhuma importação nesta sessão.</div>
+        </div>
+      </div>
+
+      <div class="card section" style="margin-top:14px">
+        <h3>Pré-visualização</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Ordem</th><th>Data</th><th>Equipamento</th><th>Tipo</th><th>Descrição</th><th>Status SAP</th></tr></thead>
+            <tbody id="previewTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer-note">Versão 3 • Base SAP Agosto/2026 com 95 ordens • Base Operacional + Histórico mensal • importação direta HTM/HTML • dados armazenados localmente neste navegador</div>
+  </main>
+</div>
+
+<script>
+const GROUPS = {
+  "LGF": {cell:1, color:"orange"},
+  "Frente": {cell:1, color:"blue"},
+  "Meio": {cell:2, color:"yellow"},
+  "Fundo": {cell:3, color:"green"},
+  "A definir": {cell:0, color:"gray"}
+};
+
+const DEFAULT_OPERATORS = [
+  {
+    "name": "LUIS ROBERTO HENRIQUE",
+    "group": "Fundo",
+    "shift": "3º Turno",
+    "status": "Ativo"
+  },
+  {
+    "name": "EDSON GONZAGA",
+    "group": "Fundo",
+    "shift": "3º Turno",
+    "status": "Ativo"
+  },
+  {
+    "name": "DOUGLAS APARECIDO DE MATOS",
+    "group": "Fundo",
+    "shift": "3º Turno",
+    "status": "Ativo"
+  },
+  {
+    "name": "RONALDO AMÉRICO PINTO",
+    "group": "Fundo",
+    "shift": "3º Turno",
+    "status": "Ativo"
+  },
+  {
+    "name": "ITAMAR ALVES DA SILVA",
+    "group": "Fundo",
+    "shift": "3º Turno",
+    "status": "Ativo"
+  },
+  {
+    "name": "REGINALDO ABILIO DE ALMEIDA PENA",
+    "group": "Fundo",
+    "shift": "2º Turno",
+    "status": "Ativo"
+  },
+  {
+    "name": "NILSON RODRIGUES",
+    "group": "Fundo",
+    "shift": "2º Turno",
+    "status": "Ativo"
+  },
+  {
+    "name": "ALADIO DE CAMARGO",
+    "group": "Fundo",
+    "shift": "2º Turno",
+    "status": "Ativo"
+  },
+  {
+    "name": "CLAUDINEI LEVINDO",
+    "group": "Fundo",
+    "shift": "2º Turno",
+    "status": "Ativo"
+  },
+  {
+    "name": "MAURO SERGIO DE SOUZA",
+    "group": "Fundo",
+    "shift": "2º Turno",
+    "status": "Ativo"
+  },
+  {
+    "name": "RENATO SOARES DE MEDEIROS",
+    "group": "Fundo",
+    "shift": "A definir",
+    "status": "Ativo"
+  },
+  {
+    "name": "LUIS HENRIQUE DA SILVA",
+    "group": "Fundo",
+    "shift": "A definir",
+    "status": "Ativo"
+  },
+  {
+    "name": "GILBERTO DE OLIVEIRA PAULA",
+    "group": "Fundo",
+    "shift": "A definir",
+    "status": "Ativo"
+  },
+  {
+    "name": "ALEXANDRE GUERRA CARVALHO",
+    "group": "Fundo",
+    "shift": "A definir",
+    "status": "Ativo"
+  },
+  {
+    "name": "JACKSON ROBERTO DA COSTA ROCHA",
+    "group": "Frente",
+    "shift": "3º Turno",
+    "status": "Ativo"
+  },
+  {
+    "name": "ROBSON LIMA DOS SANTOS",
+    "group": "Frente",
+    "shift": "3º Turno",
+    "status": "Ativo"
+  },
+  {
+    "name": "ALEXANDRE SILVA REIS",
+    "group": "Frente",
+    "shift": "2º Turno",
+    "status": "Ativo"
+  },
+  {
+    "name": "MARCELO MESQUITA",
+    "group": "Frente",
+    "shift": "2º Turno",
+    "status": "Ativo"
+  },
+  {
+    "name": "DENNER JHONATHAN PEREIRA DA SILVA",
+    "group": "Frente",
+    "shift": "2º Turno",
+    "status": "Ativo"
+  },
+  {
+    "name": "GUILHERME APARECIDO PAIVA SOARES",
+    "group": "Frente",
+    "shift": "A definir",
+    "status": "Ativo"
+  },
+  {
+    "name": "LUIZ LOURENÇO RIBEIRO",
+    "group": "Frente",
+    "shift": "A definir",
+    "status": "Ativo"
+  },
+  {
+    "name": "THIAGO LINS BORGES",
+    "group": "Frente",
+    "shift": "A definir",
+    "status": "Ativo"
+  },
+  {
+    "name": "MESSIAS RAMOS DA SILVA",
+    "group": "LGF",
+    "shift": "3º Turno",
+    "status": "Ativo"
+  },
+  {
+    "name": "SIDNEY CLEMENTINO DE MATOS",
+    "group": "LGF",
+    "shift": "2º Turno",
+    "status": "Ativo"
+  },
+  {
+    "name": "JOSE CARLOS DE OLIVEIRA CAMPOS",
+    "group": "LGF",
+    "shift": "2º Turno",
+    "status": "Ativo"
+  },
+  {
+    "name": "CARLOS ALBERTO DE SOUZA LIMA",
+    "group": "LGF",
+    "shift": "A definir",
+    "status": "Ativo"
+  },
+  {
+    "name": "TIAGO HENRIQUE DOS SANTOS",
+    "group": "LGF",
+    "shift": "A definir",
+    "status": "Ativo"
+  },
+  {
+    "name": "AGNELSON DE JESUS ARAUJO",
+    "group": "Meio",
+    "shift": "3º Turno",
+    "status": "Ativo"
+  },
+  {
+    "name": "RONAN PEREIRA SOARES",
+    "group": "Meio",
+    "shift": "3º Turno",
+    "status": "Ativo"
+  },
+  {
+    "name": "THIAGO SOUZA FRANCISCO",
+    "group": "Meio",
+    "shift": "A definir",
+    "status": "Ativo"
+  },
+  {
+    "name": "MARCIO MARQUES DOS SANTOS",
+    "group": "Meio",
+    "shift": "A definir",
+    "status": "Ativo"
+  },
+  {
+    "name": "AUGUSTO FONSECA MACHADO FILHO",
+    "group": "Meio",
+    "shift": "A definir",
+    "status": "Ativo"
+  },
+  {
+    "name": "NATANIEL DO CARMO",
+    "group": "Meio",
+    "shift": "A definir",
+    "status": "Ativo"
+  },
+  {
+    "name": "MATHEUS WEVELIN DE OLIVEIRA SANTANA",
+    "group": "Meio",
+    "shift": "A definir",
+    "status": "Ativo"
+  },
+  {
+    "name": "WELINGTON VICTORIANO CAMPOS",
+    "group": "Meio",
+    "shift": "A definir",
+    "status": "Ativo"
+  },
+  {
+    "name": "GERVAZIO DE SOUZA ANDRADE",
+    "group": "Meio",
+    "shift": "A definir",
+    "status": "Ativo"
+  },
+  {
+    "name": "JOÃO CELINO PINTO",
+    "group": "Meio",
+    "shift": "A definir",
+    "status": "Ativo"
+  },
+  {
+    "name": "ELBA JULIANA DA ROCHA PASSOS",
+    "group": "Meio",
+    "shift": "A definir",
+    "status": "Ativo"
+  }
+];
+let OPERATORS = [];
+
+const MACHINE_CATALOG = {
+  "LGF":"LGF","LAVADORA GARRAF 01":"LGF",
+  "ENCHEDORA 01":"Frente","ENCHEDORA 02":"Frente",
+  "INSPETOR NIVEL 01":"Frente","INSPETOR NIVEL 02":"Frente",
+  "INSP RES CAUST 01":"Frente","INSP RES CAUST 02":"Frente",
+  "INSP VAZAMENTO 01":"Frente","INSP VAZAMENTO 02":"Frente",
+  "INSP GARRAFAS 01":"Frente",
+  "TRANSP UIP-ECH 01":"Frente",
+  "PASTEURIZADOR":"Meio","ROTULADORA 01":"Meio","ROTULADORA 02":"Meio","MAGAZINE DE CAIXAS":"Meio",
+  "PALETIZADORA 01":"Fundo","PALETIZADORA 02":"Fundo",
+  "DESPALETIZADORA 01":"Fundo","DESPALETIZADORA 02":"Fundo",
+  "ENCAIXOTADORA 01":"Fundo","DESENCAIXOTADOR 01":"Fundo",
+  "EMPACOTADORA":"Fundo","ENVOLVEDORA":"Fundo","CINTADORA":"Fundo"
+};
+
+const DEMO = [
+  {
+    "order": "100004283985",
+    "orderType": "ZM02",
+    "date": "28/08/2026",
+    "desc": "substituir cortinas do trp UIP até ECH",
+    "loc": "JC-05040-TRANSP UIP-ECH 01 -BX504203",
+    "workCenter": "OPE1-GER",
+    "type": "209",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003578329",
+    "orderType": "ZM02",
+    "date": "08/08/2026",
+    "desc": "trampa quebrada na base",
+    "loc": "JC-05040-LAVADORA GARRAF 01-LGF504001",
+    "workCenter": "OPE1-MEC",
+    "type": "201",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100004259129",
+    "orderType": "ZM02",
+    "date": "27/08/2026",
+    "desc": "Suportes de tulipa com roldanas gastas e",
+    "loc": "JC-05040-ENCHEDORA 02 -ECH504002",
+    "workCenter": "OPE1-GER",
+    "type": "209",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100004259124",
+    "orderType": "ZM02",
+    "date": "27/08/2026",
+    "desc": "Haste do comando de válvula quebrada",
+    "loc": "JC-05040-ENCHEDORA 02 -ECH504002",
+    "workCenter": "OPE1-GER",
+    "type": "210",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100004259125",
+    "orderType": "ZM02",
+    "date": "27/08/2026",
+    "desc": "Tulipa com cone de desvio fora do padrão",
+    "loc": "JC-05040-ENCHEDORA 02 -ECH504002",
+    "workCenter": "OPE1-GER",
+    "type": "210",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100004259127",
+    "orderType": "ZM02",
+    "date": "27/08/2026",
+    "desc": "Roletes dos comandos de val danificados",
+    "loc": "JC-05040-ENCHEDORA 02 -ECH504002",
+    "workCenter": "OPE1-GER",
+    "type": "210",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100004259128",
+    "orderType": "ZM02",
+    "date": "27/08/2026",
+    "desc": "Camisas de bronze internas desgastadas",
+    "loc": "JC-05040-ENCHEDORA 02 -ECH504002",
+    "workCenter": "OPE1-GER",
+    "type": "210",
+    "userStatus": "NPLN",
+    "sap": "ABER CAPC SCDM"
+  },
+  {
+    "order": "100003353506",
+    "orderType": "ZM03",
+    "date": "31/08/2026",
+    "desc": "Limpeza e inspeção inspetor residual",
+    "loc": "JC-05040-INSP RES CAUST 01",
+    "workCenter": "OPE1-GER",
+    "type": "305",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003353508",
+    "orderType": "ZM03",
+    "date": "31/08/2026",
+    "desc": "Limpeza e inspeção inspetor residual",
+    "loc": "JC-05040-INSP RES CAUST 02",
+    "workCenter": "OPE1-GER",
+    "type": "305",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003499017",
+    "orderType": "ZM03",
+    "date": "06/08/2026",
+    "desc": "QA-0-23 Inspeção dos Pistões",
+    "loc": "JC-05040-INSPETOR NIVEL 01 -UIN504001",
+    "workCenter": "OPE1-GER",
+    "type": "306",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003845719",
+    "orderType": "ZM03",
+    "date": "31/08/2026",
+    "desc": "QA-0-43 EQ_Substituir elemento filtr",
+    "loc": "JC-05040-INSPETOR NIVEL 01 -UIN504001",
+    "workCenter": "OPE1-GER",
+    "type": "300",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC MatC NOAP"
+  },
+  {
+    "order": "100003815686",
+    "orderType": "ZM03",
+    "date": "24/08/2026",
+    "desc": "QA-0-43 EQ_Substituir elemento filtr",
+    "loc": "JC-05040-INSPETOR NIVEL 01 -UIN504001",
+    "workCenter": "OPE1-GER",
+    "type": "300",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC MatC NOAP"
+  },
+  {
+    "order": "100003787043",
+    "orderType": "ZM03",
+    "date": "17/08/2026",
+    "desc": "QA-0-43 EQ_Substituir elemento filtr",
+    "loc": "JC-05040-INSPETOR NIVEL 01 -UIN504001",
+    "workCenter": "OPE1-GER",
+    "type": "300",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC MatC NOAP"
+  },
+  {
+    "order": "100003754110",
+    "orderType": "ZM03",
+    "date": "10/08/2026",
+    "desc": "QA-0-43 EQ_Substituir elemento filtr",
+    "loc": "JC-05040-INSPETOR NIVEL 01 -UIN504001",
+    "workCenter": "OPE1-GER",
+    "type": "300",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC MatC NOAP"
+  },
+  {
+    "order": "100003724773",
+    "orderType": "ZM03",
+    "date": "10/08/2026",
+    "desc": "QA-0-43 EQ_Substituir elemento filtr",
+    "loc": "JC-05040-INSPETOR NIVEL 01 -UIN504001",
+    "workCenter": "OPE1-GER",
+    "type": "300",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC MatC NOAP"
+  },
+  {
+    "order": "100003525977",
+    "orderType": "ZM03",
+    "date": "11/08/2026",
+    "desc": "QA-0-23 Inspeção dos Pistão dos Rejeit",
+    "loc": "JC-05040-INSPETOR NIVEL 02 -UIN504002",
+    "workCenter": "OPE1-GER",
+    "type": "306",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003736180",
+    "orderType": "ZM03",
+    "date": "06/08/2026",
+    "desc": "QA-0-43 EQ_Substituir elemento filtr",
+    "loc": "JC-05040-INSPETOR NIVEL 02 -UIN504002",
+    "workCenter": "OPE1-GER",
+    "type": "300",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC MatC NOAP"
+  },
+  {
+    "order": "100003765429",
+    "orderType": "ZM03",
+    "date": "13/08/2026",
+    "desc": "QA-0-43 EQ_Substituir elemento filtr",
+    "loc": "JC-05040-INSPETOR NIVEL 02 -UIN504002",
+    "workCenter": "OPE1-GER",
+    "type": "300",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC MatC NOAP"
+  },
+  {
+    "order": "100003796362",
+    "orderType": "ZM03",
+    "date": "20/08/2026",
+    "desc": "QA-0-43 EQ_Substituir elemento filtr",
+    "loc": "JC-05040-INSPETOR NIVEL 02 -UIN504002",
+    "workCenter": "OPE1-GER",
+    "type": "300",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC MatC NOAP"
+  },
+  {
+    "order": "100003825607",
+    "orderType": "ZM03",
+    "date": "27/08/2026",
+    "desc": "QA-0-43 EQ_Substituir elemento filtr",
+    "loc": "JC-05040-INSPETOR NIVEL 02 -UIN504002",
+    "workCenter": "OPE1-GER",
+    "type": "300",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC MatC NOAP"
+  },
+  {
+    "order": "100003484849",
+    "orderType": "ZM03",
+    "date": "03/08/2026",
+    "desc": "QA-0-23 Inspeção dos Pistão dos Rejeit",
+    "loc": "JC-05040-INSP VAZAMENTO 01 -UIV504009",
+    "workCenter": "OPE1-GER",
+    "type": "306",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003499018",
+    "orderType": "ZM03",
+    "date": "06/08/2026",
+    "desc": "QA-0-23 Inspeção dos Pistões",
+    "loc": "JC-05040-INSP VAZAMENTO 02 -UIV504010",
+    "workCenter": "OPE1-GER",
+    "type": "306",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003890006",
+    "orderType": "ZM03",
+    "date": "21/08/2026",
+    "desc": "BL-2-12 Insp. sistema de vapor",
+    "loc": "JC-05040-LAVADORA GARRAF 01-AA504003",
+    "workCenter": "OPE1-GER",
+    "type": "306",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003890010",
+    "orderType": "ZM03",
+    "date": "21/08/2026",
+    "desc": "BL-2-12 Insp. sistema de vaporpor",
+    "loc": "JC-05040-LAVADORA GARRAF 01-AA504004",
+    "workCenter": "OPE1-GER",
+    "type": "306",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100004046189",
+    "orderType": "ZM03",
+    "date": "21/08/2026",
+    "desc": "Inspeção do sistema de vapor",
+    "loc": "JC-05040-LAVADORA GARRAF 01-LGF504001",
+    "workCenter": "OPE1-GER",
+    "type": "306",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003800486",
+    "orderType": "ZM03",
+    "date": "25/08/2026",
+    "desc": "QA-1-47 Insp perfil guia estrela entrada",
+    "loc": "JC-05040-ENCHEDORA 01 -ECH504001",
+    "workCenter": "OPE1-GER",
+    "type": "306",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003800490",
+    "orderType": "ZM03",
+    "date": "25/08/2026",
+    "desc": "QA-1-52 Insp perfil guia estrela interm",
+    "loc": "JC-05040-ENCHEDORA 01 -ECH504001",
+    "workCenter": "OPE1-GER",
+    "type": "306",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003800544",
+    "orderType": "ZM03",
+    "date": "26/08/2026",
+    "desc": "Insp Régua Vacuo e alívio",
+    "loc": "JC-05040-ENCHEDORA 01 -ECH504001",
+    "workCenter": "OPE1-GER",
+    "type": "305",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003800498",
+    "orderType": "ZM03",
+    "date": "25/08/2026",
+    "desc": "Insp duchas auto flush",
+    "loc": "JC-05040-ENCHEDORA 01 -ECH504001",
+    "workCenter": "OPE1-GER",
+    "type": "301",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003800555",
+    "orderType": "ZM03",
+    "date": "07/08/2026",
+    "desc": "QA-0-97 Insp. Válv Enchimento",
+    "loc": "JC-05040-ENCHEDORA 01 -ECH504001",
+    "workCenter": "OPE1-GER",
+    "type": "306",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003800556",
+    "orderType": "ZM03",
+    "date": "17/08/2026",
+    "desc": "QA-0-97 Insp. Válv Enchimento",
+    "loc": "JC-05040-ENCHEDORA 01 -ECH504001",
+    "workCenter": "OPE1-GER",
+    "type": "306",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003800621",
+    "orderType": "ZM03",
+    "date": "25/08/2026",
+    "desc": "QA-1-46 Insp perfil lateral sem fim",
+    "loc": "JC-05040-ENCHEDORA 01 -ECH504001",
+    "workCenter": "OPE1-GER",
+    "type": "306",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003804773",
+    "orderType": "ZM03",
+    "date": "04/08/2026",
+    "desc": "QA-1-63 EQ-Insp. Interna Mangueiras",
+    "loc": "JC-05040-ENCHEDORA 01 -ECH504001",
+    "workCenter": "OPE1-GER",
+    "type": "305",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003806571",
+    "orderType": "ZM03",
+    "date": "04/08/2026",
+    "desc": "EQ-Trocar filtos microb. CO2",
+    "loc": "JC-05040-ENCHEDORA 01 -F504044",
+    "workCenter": "OPE1-GER",
+    "type": "300",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC MatC NOAP"
+  },
+  {
+    "order": "100003806574",
+    "orderType": "ZM03",
+    "date": "04/08/2026",
+    "desc": "EQ_Trocar filtro de part. ar comp.",
+    "loc": "JC-05040-ENCHEDORA 01 -F504045",
+    "workCenter": "OPE1-GER",
+    "type": "300",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC MatC NOAP"
+  },
+  {
+    "order": "100003806565",
+    "orderType": "ZM03",
+    "date": "04/08/2026",
+    "desc": "EQ-Trocar filtros de part. CO2",
+    "loc": "JC-05040-ENCHEDORA 01 -F504046",
+    "workCenter": "OPE1-GER",
+    "type": "300",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC MatC NOAP"
+  },
+  {
+    "order": "100003806568",
+    "orderType": "ZM03",
+    "date": "04/08/2026",
+    "desc": "EQ-Trocar filtros de part. CO2",
+    "loc": "JC-05040-ENCHEDORA 01 -F504047",
+    "workCenter": "OPE1-GER",
+    "type": "300",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC MatC NOAP"
+  },
+  {
+    "order": "100003804867",
+    "orderType": "ZM03",
+    "date": "04/08/2026",
+    "desc": "EQ-Insp de Válvula de Retenção",
+    "loc": "JC-05040-ENCHEDORA 01 -RV504001",
+    "workCenter": "OPE1-GER",
+    "type": "305",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003819008",
+    "orderType": "ZM03",
+    "date": "27/08/2026",
+    "desc": "QA-0-97 Insp. Válv Enchimento",
+    "loc": "JC-05040-ENCHEDORA 02 -ECH504002",
+    "workCenter": "OPE1-GER",
+    "type": "306",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003806689",
+    "orderType": "ZM03",
+    "date": "26/08/2026",
+    "desc": "QA-1-52 Insp perfil guia estrela interm",
+    "loc": "JC-05040-ENCHEDORA 02 -ECH504002",
+    "workCenter": "OPE1-GER",
+    "type": "306",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003806688",
+    "orderType": "ZM03",
+    "date": "26/08/2026",
+    "desc": "QA-1-50 Insp perfil guia estrela saída",
+    "loc": "JC-05040-ENCHEDORA 02 -ECH504002",
+    "workCenter": "OPE1-GER",
+    "type": "306",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003806687",
+    "orderType": "ZM03",
+    "date": "26/08/2026",
+    "desc": "QA-1-47 Insp perfil guia estrela entrada",
+    "loc": "JC-05040-ENCHEDORA 02 -ECH504002",
+    "workCenter": "OPE1-GER",
+    "type": "306",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003806686",
+    "orderType": "ZM03",
+    "date": "26/08/2026",
+    "desc": "QA-1-46 Insp perfil lateral sem fim",
+    "loc": "JC-05040-ENCHEDORA 02 -ECH504002",
+    "workCenter": "OPE1-GER",
+    "type": "306",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003804928",
+    "orderType": "ZM03",
+    "date": "04/08/2026",
+    "desc": "QA-1-63 EQ-Insp. Interna Mangueiras",
+    "loc": "JC-05040-ENCHEDORA 02 -ECH504002",
+    "workCenter": "OPE1-GER",
+    "type": "305",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003804930",
+    "orderType": "ZM03",
+    "date": "27/08/2026",
+    "desc": "Insp Régua Vacuo e alívio",
+    "loc": "JC-05040-ENCHEDORA 02 -ECH504002",
+    "workCenter": "OPE1-GER",
+    "type": "305",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003806672",
+    "orderType": "ZM03",
+    "date": "08/08/2026",
+    "desc": "QA-0-97 Insp. Válv Enchimento",
+    "loc": "JC-05040-ENCHEDORA 02 -ECH504002",
+    "workCenter": "OPE1-GER",
+    "type": "306",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003806673",
+    "orderType": "ZM03",
+    "date": "18/08/2026",
+    "desc": "QA-0-97 Insp. Válv Enchimento",
+    "loc": "JC-05040-ENCHEDORA 02 -ECH504002",
+    "workCenter": "OPE1-GER",
+    "type": "306",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003804927",
+    "orderType": "ZM03",
+    "date": "26/08/2026",
+    "desc": "Insp duchas auto flush",
+    "loc": "JC-05040-ENCHEDORA 02 -ECH504002",
+    "workCenter": "OPE1-GER",
+    "type": "301",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003806628",
+    "orderType": "ZM03",
+    "date": "04/08/2026",
+    "desc": "EQ-Trocar filtos microb. CO2",
+    "loc": "JC-05040-ENCHEDORA 02 -F504052",
+    "workCenter": "OPE1-GER",
+    "type": "300",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC MatC NOAP"
+  },
+  {
+    "order": "100003806631",
+    "orderType": "ZM03",
+    "date": "04/08/2026",
+    "desc": "EQ_Trocar filtro de part. ar comp.",
+    "loc": "JC-05040-ENCHEDORA 02 -F504053",
+    "workCenter": "OPE1-GER",
+    "type": "300",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC MatC NOAP"
+  },
+  {
+    "order": "100003806622",
+    "orderType": "ZM03",
+    "date": "04/08/2026",
+    "desc": "EQ-Trocar filtros de part. CO2",
+    "loc": "JC-05040-ENCHEDORA 02 -F504054",
+    "workCenter": "OPE1-GER",
+    "type": "300",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC MatC NOAP"
+  },
+  {
+    "order": "100003806625",
+    "orderType": "ZM03",
+    "date": "04/08/2026",
+    "desc": "EQ-Trocar filtros de part. CO2",
+    "loc": "JC-05040-ENCHEDORA 02 -F504055",
+    "workCenter": "OPE1-GER",
+    "type": "300",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC MatC NOAP"
+  },
+  {
+    "order": "100002981626",
+    "orderType": "ZM03",
+    "date": "05/08/2026",
+    "desc": "EQ_Substituir elemento filtrante e siste",
+    "loc": "JC-05040-INSP GARRAFAS 01 -CPN504930",
+    "workCenter": "OPE1-GER",
+    "type": "300",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC MatC NOAP"
+  },
+  {
+    "order": "100003628610",
+    "orderType": "ZM03",
+    "date": "06/08/2026",
+    "desc": "QA-2-42 - Lubrificar Mancal TRP Entrada",
+    "loc": "JC-05040-INSP GARRAFAS 01 -TRP504001",
+    "workCenter": "OPE1-GER",
+    "type": "305",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003800616",
+    "orderType": "ZM03",
+    "date": "07/08/2026",
+    "desc": "QA-1-18 Trocar elemento filtro trap",
+    "loc": "JC-05040-ENCHEDORA 01 -F504002",
+    "workCenter": "OPE1-GER",
+    "type": "300",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC MatC NOAP"
+  },
+  {
+    "order": "100003800617",
+    "orderType": "ZM03",
+    "date": "17/08/2026",
+    "desc": "QA-1-18 Trocar elemento filtro trap",
+    "loc": "JC-05040-ENCHEDORA 01 -F504002",
+    "workCenter": "OPE1-GER",
+    "type": "300",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC MatC NOAP"
+  },
+  {
+    "order": "100003819007",
+    "orderType": "ZM03",
+    "date": "27/08/2026",
+    "desc": "QA-1-18 Trocar elemento filtro trap",
+    "loc": "JC-05040-ENCHEDORA 01 -F504002",
+    "workCenter": "OPE1-GER",
+    "type": "300",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC MatC NOAP"
+  },
+  {
+    "order": "100003819009",
+    "orderType": "ZM03",
+    "date": "27/08/2026",
+    "desc": "QA-1-18 Trocar elemento filtro trap",
+    "loc": "JC-05040-ENCHEDORA 02 -F504003",
+    "workCenter": "OPE1-GER",
+    "type": "300",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC MatC NOAP"
+  },
+  {
+    "order": "100003806685",
+    "orderType": "ZM03",
+    "date": "18/08/2026",
+    "desc": "QA-1-18 Trocar elemento filtro trap",
+    "loc": "JC-05040-ENCHEDORA 02 -F504003",
+    "workCenter": "OPE1-GER",
+    "type": "300",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC MatC NOAP"
+  },
+  {
+    "order": "100003806684",
+    "orderType": "ZM03",
+    "date": "08/08/2026",
+    "desc": "QA-1-18 Trocar elemento filtro trap",
+    "loc": "JC-05040-ENCHEDORA 02 -F504003",
+    "workCenter": "OPE1-GER",
+    "type": "300",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC MatC NOAP"
+  },
+  {
+    "order": "100003804977",
+    "orderType": "ZM03",
+    "date": "04/08/2026",
+    "desc": "EQ-Insp de Válvula de Retenção",
+    "loc": "JC-05040-ENCHEDORA 02 -RV504009",
+    "workCenter": "OPE1-GER",
+    "type": "305",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100004258230",
+    "orderType": "ZM03",
+    "date": "10/08/2026",
+    "desc": "QA-0-07 Troca dos copos de lavagem",
+    "loc": "JC-05040-LAVADORA GARRAF 01-LGF504001",
+    "workCenter": "OPE1-GER",
+    "type": "300",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC MatC NOAP"
+  },
+  {
+    "order": "100003719767",
+    "orderType": "ZM03",
+    "date": "25/08/2026",
+    "desc": "Lubrificação do caixa de transmissão",
+    "loc": "JC-05040-ROTULADORA 01 -ACT504002",
+    "workCenter": "OPE1-GER",
+    "type": "302",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003624612",
+    "orderType": "ZM03",
+    "date": "05/08/2026",
+    "desc": "Lubrificação do caixa de transmissão",
+    "loc": "JC-05040-ROTULADORA 01 -ACT504004",
+    "workCenter": "OPE1-GER",
+    "type": "302",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003719768",
+    "orderType": "ZM03",
+    "date": "25/08/2026",
+    "desc": "Lubrificação do caixa de transmissão",
+    "loc": "JC-05040-ROTULADORA 02 -ACT504002",
+    "workCenter": "OPE1-GER",
+    "type": "302",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003624613",
+    "orderType": "ZM03",
+    "date": "05/08/2026",
+    "desc": "Lubrificação do caixa de transmissão",
+    "loc": "JC-05040-ROTULADORA 02 -ACT504004",
+    "workCenter": "OPE1-GER",
+    "type": "302",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003073646",
+    "orderType": "ZM03",
+    "date": "26/08/2026",
+    "desc": "Inspeção da mesa giratoria, verifica",
+    "loc": "JC-05040-DESPALETIZADORA 01-MGP504001",
+    "workCenter": "OPE1-GER",
+    "type": "305",
+    "userStatus": "NPLN",
+    "sap": "LIB CONF CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003650652",
+    "orderType": "ZM03",
+    "date": "10/08/2026",
+    "desc": "Inspeção de vazamento do sistema pne",
+    "loc": "JC-05040-DESPALETIZADORA 01-ACT504001",
+    "workCenter": "OPE1-GER",
+    "type": "305",
+    "userStatus": "NPLN",
+    "sap": "LIB CONF CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003073645",
+    "orderType": "ZM03",
+    "date": "26/08/2026",
+    "desc": "Insepeção da mesa giratoria, verific",
+    "loc": "JC-05040-DESPALETIZADORA 02-MGP504001",
+    "workCenter": "OPE1-GER",
+    "type": "305",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003792322",
+    "orderType": "ZM03",
+    "date": "27/08/2026",
+    "desc": "Troca menbranas das tulipas, verific",
+    "loc": "JC-05040-DESENCAIXOTADOR 01-DCX504001",
+    "workCenter": "OPE1-GER",
+    "type": "300",
+    "userStatus": "NPLN",
+    "sap": "LIB CONF CAPC MOME MatC NOAP"
+  },
+  {
+    "order": "100003731922",
+    "orderType": "ZM03",
+    "date": "28/08/2026",
+    "desc": "EQ-Inspeção e limpeza do sistema coa",
+    "loc": "JC-05040-APLIC COATING 01 -CTG504060",
+    "workCenter": "OPE1-GER",
+    "type": "305",
+    "userStatus": "NPLN",
+    "sap": "LIB CONF CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003680903",
+    "orderType": "ZM03",
+    "date": "16/08/2026",
+    "desc": "EQ-Inspeção e limpeza do sistema coa",
+    "loc": "JC-05040-APLIC COATING 02 -CTG504070",
+    "workCenter": "OPE1-GER",
+    "type": "305",
+    "userStatus": "NPLN",
+    "sap": "LIB CONF CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003614054",
+    "orderType": "ZM03",
+    "date": "14/08/2026",
+    "desc": "QA-0-43 EQ_Substituir elemento filtrante",
+    "loc": "JC-05040-INSP GARRAFAS 01 -CPN504001",
+    "workCenter": "OPE1-GER",
+    "type": "300",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC MatC NOAP"
+  },
+  {
+    "order": "100003680944",
+    "orderType": "ZM03",
+    "date": "16/08/2026",
+    "desc": "Completar Nivel de Oleo Lubrifil e l",
+    "loc": "JC-05040-ROTULADORA 02 -CPN504024",
+    "workCenter": "OPE1-GER",
+    "type": "302",
+    "userStatus": "NPLN",
+    "sap": "LIB CONF CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003691353",
+    "orderType": "ZM03",
+    "date": "18/08/2026",
+    "desc": "Completar nevel de oleo lubrifil e l",
+    "loc": "JC-05040-ROTULADORA 01 -CPN504023",
+    "workCenter": "OPE1-GER",
+    "type": "302",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003624363",
+    "orderType": "ZM03",
+    "date": "05/08/2026",
+    "desc": "Lubrificação do mancal de elevação,",
+    "loc": "JC-05040-DESPALETIZADORA 01-DPL504001",
+    "workCenter": "OPE1-GER",
+    "type": "302",
+    "userStatus": "NPLN",
+    "sap": "LIB CONF CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003744574",
+    "orderType": "ZM03",
+    "date": "16/08/2026",
+    "desc": "Troca das menbranas das tulipas, ver",
+    "loc": "JC-05040-ENCAIXOTADORA 01 -ECX504001",
+    "workCenter": "OPE1-GER",
+    "type": "300",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC MOME MatC NOAP"
+  },
+  {
+    "order": "100003680814",
+    "orderType": "ZM03",
+    "date": "01/08/2026",
+    "desc": "Troca das menbranas das tulipas, ver",
+    "loc": "JC-05040-ENCAIXOTADORA 01 -ECX504001",
+    "workCenter": "OPE1-GER",
+    "type": "300",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC MOME MatC NOAP"
+  },
+  {
+    "order": "100003811157",
+    "orderType": "ZM03",
+    "date": "31/08/2026",
+    "desc": "Troca das menbranas das tulipas, ver",
+    "loc": "JC-05040-ENCAIXOTADORA 01 -ECX504001",
+    "workCenter": "OPE1-GER",
+    "type": "300",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC MOME MatC NOAP"
+  },
+  {
+    "order": "100003825806",
+    "orderType": "ZM03",
+    "date": "27/08/2026",
+    "desc": "BL-1-16 Manut. VV's criticas inspeção",
+    "loc": "JC-05040-ENCHEDORA 01 -ECH504001",
+    "workCenter": "OPE1-GER",
+    "type": "306",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003796135",
+    "orderType": "ZM03",
+    "date": "20/08/2026",
+    "desc": "BL-1-16 Manut. VV's criticas inspeção",
+    "loc": "JC-05040-ENCHEDORA 01 -ECH504001",
+    "workCenter": "OPE1-GER",
+    "type": "306",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003765445",
+    "orderType": "ZM03",
+    "date": "13/08/2026",
+    "desc": "BL-1-16 Manut. VV's criticas inspeção",
+    "loc": "JC-05040-ENCHEDORA 01 -ECH504001",
+    "workCenter": "OPE1-GER",
+    "type": "306",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003735929",
+    "orderType": "ZM03",
+    "date": "06/08/2026",
+    "desc": "BL-1-16 Manut. VV's criticas inspeção",
+    "loc": "JC-05040-ENCHEDORA 01 -ECH504001",
+    "workCenter": "OPE1-GER",
+    "type": "306",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003705414",
+    "orderType": "ZM03",
+    "date": "22/08/2026",
+    "desc": "Inspeção do sistema de autoflush,",
+    "loc": "JC-05040-ENCHEDORA 01 -ECH504001",
+    "workCenter": "OPE1-GER",
+    "type": "306",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003624329",
+    "orderType": "ZM03",
+    "date": "15/08/2026",
+    "desc": "Inspeção pistões elevadores",
+    "loc": "JC-05040-ENCHEDORA 01 -ECH504001",
+    "workCenter": "OPE1-GER",
+    "type": "306",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100004188343",
+    "orderType": "ZM03",
+    "date": "04/08/2026",
+    "desc": "QA-0-01 Trocar aba conica/borracha tulip",
+    "loc": "JC-05040-ENCHEDORA 01 -ECH504001",
+    "workCenter": "OPE1-GER",
+    "type": "300",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC MOME MatC NOAP"
+  },
+  {
+    "order": "100004188344",
+    "orderType": "ZM03",
+    "date": "23/08/2026",
+    "desc": "QA-0-01 Trocar aba conica/borracha tulip",
+    "loc": "JC-05040-ENCHEDORA 01 -ECH504001",
+    "workCenter": "OPE1-GER",
+    "type": "300",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC MOME MatC NOAP"
+  },
+  {
+    "order": "100003796134",
+    "orderType": "ZM03",
+    "date": "20/08/2026",
+    "desc": "BL-1-16 Manut. VV's criticas inspeção",
+    "loc": "JC-05040-ENCHEDORA 02 -ECH504002",
+    "workCenter": "OPE1-GER",
+    "type": "306",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003765444",
+    "orderType": "ZM03",
+    "date": "13/08/2026",
+    "desc": "BL-1-16 Manut. VV's criticas inspeção",
+    "loc": "JC-05040-ENCHEDORA 02 -ECH504002",
+    "workCenter": "OPE1-GER",
+    "type": "306",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003735928",
+    "orderType": "ZM03",
+    "date": "06/08/2026",
+    "desc": "BL-1-16 Manut. VV's criticas inspeção",
+    "loc": "JC-05040-ENCHEDORA 02 -ECH504002",
+    "workCenter": "OPE1-GER",
+    "type": "306",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003705415",
+    "orderType": "ZM03",
+    "date": "22/08/2026",
+    "desc": "Inspeção do sistema de autoflush,",
+    "loc": "JC-05040-ENCHEDORA 02 -ECH504002",
+    "workCenter": "OPE1-GER",
+    "type": "305",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100003624331",
+    "orderType": "ZM03",
+    "date": "15/08/2026",
+    "desc": "Inspeção pistões elevadores",
+    "loc": "JC-05040-ENCHEDORA 02 -ECH504002",
+    "workCenter": "OPE1-GER",
+    "type": "306",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC NOAP SCDM"
+  },
+  {
+    "order": "100004188349",
+    "orderType": "ZM03",
+    "date": "04/08/2026",
+    "desc": "QA-0-01 Trocar aba conica/borracha tulip",
+    "loc": "JC-05040-ENCHEDORA 02 -ECH504002",
+    "workCenter": "OPE1-GER",
+    "type": "300",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC MOME MatC NOAP"
+  },
+  {
+    "order": "100004188350",
+    "orderType": "ZM03",
+    "date": "23/08/2026",
+    "desc": "QA-0-01 Trocar aba conica/borracha tulip",
+    "loc": "JC-05040-ENCHEDORA 02 -ECH504002",
+    "workCenter": "OPE1-GER",
+    "type": "300",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC MOME MatC NOAP"
+  },
+  {
+    "order": "100003728399",
+    "orderType": "ZM03",
+    "date": "13/08/2026",
+    "desc": "Troca sistema do pistão de centragem",
+    "loc": "JC-05040-ROTULADORA 01 -RT504001",
+    "workCenter": "OPE1-GER",
+    "type": "300",
+    "userStatus": "NPLN",
+    "sap": "LIB CAPC MOME MatC NOAP"
+  }
+];
+
+let state = {
+  orders: JSON.parse(localStorage.getItem("po504_orders") || "[]"),
+  overrides: JSON.parse(localStorage.getItem("po504_overrides") || "{}"),
+  lastUpdate: localStorage.getItem("po504_lastUpdate") || "",
+  importHistory: JSON.parse(localStorage.getItem("po504_importHistory") || "[]")
+};
+
+function loadOperators(){
+  const saved=JSON.parse(localStorage.getItem("po504_operators") || "null");
+  OPERATORS=Array.isArray(saved)&&saved.length?saved:DEFAULT_OPERATORS.map(o=>({...o}));
+  OPERATORS.forEach(o=>{o.group=o.group||"Frente";o.shift=o.shift||"A definir";o.status=o.status||"Ativo";o.cell=GROUPS[o.group]?.cell||0;});
+}
+loadOperators();
+
+function persist(){
+  localStorage.setItem("po504_orders",JSON.stringify(state.orders));
+  localStorage.setItem("po504_overrides",JSON.stringify(state.overrides));
+  localStorage.setItem("po504_lastUpdate",state.lastUpdate||"");
+  localStorage.setItem("po504_importHistory",JSON.stringify(state.importHistory||[]));
+  localStorage.setItem("po504_operators",JSON.stringify(OPERATORS));
+}
+
+function norm(s){return (s||"").toString().trim().toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"")}
+function parseBRDate(s){
+  if(!s)return null;
+  s=s.trim();
+  let m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if(m)return new Date(+m[3],+m[2]-1,+m[1],12,0,0);
+  let d=new Date(s); return isNaN(d)?null:d;
+}
+function fmtDate(d){
+  if(!d)return "";
+  if(!(d instanceof Date)) d=parseBRDate(d);
+  if(!d)return "";
+  return d.toLocaleDateString("pt-BR");
+}
+function monthKey(dateStr){
+  const d=parseBRDate(dateStr); if(!d)return "";
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
+}
+function monthLabel(key){
+  if(!key)return "Todos os meses";
+  const [y,m]=key.split("-").map(Number); if(!y||!m)return key;
+  return new Date(y,m-1,1).toLocaleDateString("pt-BR",{month:"long",year:"numeric"}).replace(/^./,c=>c.toUpperCase());
+}
+function availableMonths(){return [...new Set(state.orders.map(o=>monthKey(o.date)).filter(Boolean))].sort();}
+function activeOperators(){return OPERATORS.filter(o=>o.status==="Ativo");}
+function operatorByName(name){return OPERATORS.find(o=>o.name===name);}
+function deltaHTML(current,compare,invert=false,suffix=""){
+  if(compare===null||compare===undefined)return "";
+  const d=current-compare;if(d===0)return `<span class="delta neutral">= ${suffix||"sem variação"}</span>`;
+  const good=invert?d<0:d>0;
+  return `<span class="delta ${good?"good":"bad"}">${d>0?"↑":"↓"} ${Math.abs(d)}${suffix}</span>`;
+}
+function renderMonthSelectors(){
+  const months=availableMonths();
+  const dash=document.querySelector("#dashMonth"), comp=document.querySelector("#dashCompare"), prog=document.querySelector("#fMonth"), perf=document.querySelector("#perfMonth");
+  if(dash){const cur=dash.value;dash.innerHTML='<option value="">Todos os meses</option>'+months.map(k=>`<option value="${k}">${monthLabel(k)}</option>`).join("");dash.value=months.includes(cur)?cur:(months.at(-1)||"");}
+  if(comp){const cur=comp.value;comp.innerHTML='<option value="">Sem comparação</option>'+months.map(k=>`<option value="${k}">${monthLabel(k)}</option>`).join("");if(months.includes(cur))comp.value=cur;else if(months.length>1)comp.value=months.at(-2);}
+  if(prog){const cur=prog.value;prog.innerHTML='<option value="">Todos os meses</option>'+months.map(k=>`<option value="${k}">${monthLabel(k)}</option>`).join("");if(months.includes(cur))prog.value=cur;}
+  if(perf){const cur=perf.value;perf.innerHTML='<option value="">Todos os meses</option>'+months.map(k=>`<option value="${k}">${monthLabel(k)}</option>`).join("");perf.value=months.includes(cur)?cur:(months.at(-1)||"");}
+}
+
+function weekKey(dateStr){
+  const d=parseBRDate(dateStr); if(!d)return "";
+  const day=(d.getDay()+6)%7; const mon=new Date(d); mon.setDate(d.getDate()-day);
+  const sun=new Date(mon); sun.setDate(mon.getDate()+6);
+  return `${fmtDate(mon)}–${fmtDate(sun)}`;
+}
+function isConfirmed(s){return /(^|\s)CONF(\s|$)/i.test((s||"").trim())}
+function isCritical(type){return ["300","302","306"].includes(String(type||"").trim())}
+function overdue(o){
+  if(isConfirmed(o.sap))return false;
+  const d=parseBRDate(o.date); if(!d)return false;
+  const today=new Date(); today.setHours(0,0,0,0); d.setHours(0,0,0,0);
+  return d < today;
+}
+function statusOf(o){
+  if(isConfirmed(o.sap))return "executada";
+  if(!o.owner)return "sem_responsavel";
+  if(overdue(o))return "atrasada";
+  return "pendente";
+}
+function statusBadge(o){
+  const s=statusOf(o);
+  return s==="executada"?'<span class="badge green">● Executada</span>':
+         s==="atrasada"?'<span class="badge red">● Atrasada</span>':
+         s==="sem_responsavel"?'<span class="badge gray">● Sem responsável</span>':
+         '<span class="badge yellow">● Pendente</span>';
+}
+function cleanEquipment(loc, explicit){
+  if(explicit && norm(explicit)!=="EQUIP") return explicit.toString().trim().replace(/^JC-05040-/i,"").toUpperCase();
+  const n=norm(loc);
+  const patterns=[
+    "TRANSP UIP-ECH 01","LAVADORA GARRAF 01","ENCHEDORA 01","ENCHEDORA 02","INSP RES CAUST 01","INSP RES CAUST 02",
+    "INSPETOR NIVEL 01","INSPETOR NIVEL 02","INSP VAZAMENTO 01","INSP VAZAMENTO 02","INSP GARRAFAS 01",
+    "ROTULADORA 01","ROTULADORA 02","DESPALETIZADORA 01","DESPALETIZADORA 02","DESENCAIXOTADOR 01",
+    "ENCAIXOTADORA 01","APLIC COATING 01","APLIC COATING 02","PASTEURIZADOR","PALETIZADORA 01","PALETIZADORA 02",
+    "EMPACOTADORA","ENVOLVEDORA","CINTADORA","MAGAZINE DE CAIXAS"
+  ];
+  for(const p of patterns) if(n.includes(norm(p))) return p;
+  if(/^JC-05040-LGF\b/.test(n) || n==="LGF") return "LGF";
+  const m=(loc||"").match(/JC-05040-([^-\n]+(?:\s0[12])?)/i);
+  return m?m[1].trim().toUpperCase():(explicit||"NÃO IDENTIFICADO");
+}
+function groupForEquipment(eq){
+  if(state.overrides[eq])return state.overrides[eq];
+  if(MACHINE_CATALOG[eq])return MACHINE_CATALOG[eq];
+  const n=norm(eq);
+  if(n.includes("TRANSP") && (n.includes("UIP")||n.includes("ECH")))return "Frente";
+  if(n.includes("ENCHEDORA")||n.includes("INSPETOR")||n.startsWith("INSP "))return "Frente";
+  if(n==="LGF"||n.includes("LAVADORA GARRAF"))return "LGF";
+  if(n.includes("ROTULADORA")||n.includes("PASTEUR")||n.includes("MAGAZINE"))return "Meio";
+  if(n.includes("PALET")||n.includes("DESPALET")||n.includes("ENCAIX")||n.includes("DESENCAIX")||n.includes("EMPACOT")||n.includes("ENVOLV")||n.includes("CINTAD"))return "Fundo";
+  return "A definir";
+}
+function hydrateOrder(raw, existing){
+  const equipment=cleanEquipment(raw.loc,raw.equipment);
+  const group=groupForEquipment(equipment);
+  const cell=GROUPS[group].cell;
+  return {
+    order:String(raw.order||"").trim(), orderType:String(raw.orderType||"").trim(),
+    date:raw.date||"", desc:raw.desc||"", loc:raw.loc||"", workCenter:raw.workCenter||"",
+    type:String(raw.type||"").trim(), userStatus:raw.userStatus||"", sap:raw.sap||"", equipment, group, cell,
+    owner:existing?.owner||raw.owner||"", importedAt:new Date().toISOString(),
+    firstSeenAt:existing?.firstSeenAt||raw.firstSeenAt||new Date().toISOString(),
+    completedAt:existing?.completedAt||raw.completedAt||""
+  };
+}
+function rebalanceAssignments(){
+  const load={};
+  const active=activeOperators();
+  for(const o of state.orders){
+    o.equipment=cleanEquipment(o.loc,o.equipment);
+    o.group=groupForEquipment(o.equipment);
+    o.cell=GROUPS[o.group].cell;
+    const op=operatorByName(o.owner);
+    const ownerValid=op && op.group===o.group && op.status==="Ativo";
+    if(isConfirmed(o.sap) && o.owner){
+      // histórico executado: mantém o responsável mesmo em férias ou após mudança de grupo
+    }else if(ownerValid){
+      const k=o.group+"|"+weekKey(o.date)+"|"+o.owner; load[k]=(load[k]||0)+1;
+    }else{
+      o.owner="";
+    }
+    if(o.group==="A definir" && !isConfirmed(o.sap))o.owner="";
+  }
+  const sorted=[...state.orders].sort((a,b)=>(parseBRDate(a.date)||0)-(parseBRDate(b.date)||0)||a.order.localeCompare(b.order));
+  for(const o of sorted){
+    if(o.owner || o.group==="A definir")continue;
+    const candidates=active.filter(x=>x.group===o.group);
+    if(!candidates.length)continue;
+    const wk=weekKey(o.date);
+    candidates.sort((a,b)=>(load[o.group+"|"+wk+"|"+a.name]||0)-(load[o.group+"|"+wk+"|"+b.name]||0)||a.name.localeCompare(b.name));
+    o.owner=candidates[0].name;
+    const k=o.group+"|"+wk+"|"+o.owner; load[k]=(load[k]||0)+1;
+  }
+  persist();
+}
+function loadDemo(force=false){
+  if(state.orders.length && !force && !confirm("Já existem dados. Substituir pela base SAP de agosto com 95 ordens?"))return;
+  state.orders=DEMO.map(x=>hydrateOrder(x));
+  state.lastUpdate="Base SAP Agosto/2026 • 95 ordens carregadas em "+new Date().toLocaleString("pt-BR");
+  rebalanceAssignments(); persist(); renderAll();
+}
+const EMBEDDED_BASE_VERSION = "SAP_AGO_2026_95_V3";
+function syncEmbeddedBase(){
+  if(localStorage.getItem("po504_embeddedBaseVersion")===EMBEDDED_BASE_VERSION)return false;
+  const map=new Map(state.orders.map(o=>[String(o.order),o]));
+  let created=0,updated=0;
+  for(const r of DEMO){
+    const existing=map.get(String(r.order));
+    const obj=hydrateOrder(r,existing);
+    if(existing){Object.assign(existing,obj,{owner:existing.owner||obj.owner});updated++;}
+    else{state.orders.push(obj);map.set(obj.order,obj);created++;}
+  }
+  localStorage.setItem("po504_embeddedBaseVersion",EMBEDDED_BASE_VERSION);
+  state.lastUpdate=`Base SAP sincronizada • 95 ordens • ${created} novas • ${updated} atualizadas • ${new Date().toLocaleString("pt-BR")}`;
+  rebalanceAssignments(); persist();
+  return true;
+}
+
+function clearData(){
+  if(!confirm("Limpar as ordens e o histórico de importações deste navegador? A Base Operacional será mantida."))return;
+  state.orders=[]; state.overrides={}; state.lastUpdate=""; state.importHistory=[]; persist(); renderAll();
+}
+function downloadBackup(){
+  const blob=new Blob([JSON.stringify({orders:state.orders,operators:OPERATORS,overrides:state.overrides,importHistory:state.importHistory,exportedAt:new Date().toISOString()},null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="backup_programacao_504.json";a.click();URL.revokeObjectURL(a.href);
+}
+
+function summary(rows){
+  const total=rows.length, exec=rows.filter(o=>isConfirmed(o.sap)).length, late=rows.filter(overdue).length,
+        noOwner=rows.filter(o=>!o.owner).length, pending=total-exec, crit=rows.filter(o=>isCritical(o.type)&&!isConfirmed(o.sap)).length;
+  return {total,exec,late,noOwner,pending,crit,pct:total?Math.round(exec/total*100):0};
+}
+function cellLabel(c){return c===1?"Célula 1":c===2?"Célula 2":c===3?"Célula 3":"Não mapeado"}
+function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]))}
+
+function renderDashboard(){
+  const selected=document.querySelector("#dashMonth")?.value||"";
+  const compareKey=document.querySelector("#dashCompare")?.value||"";
+  const rows=selected?state.orders.filter(o=>monthKey(o.date)===selected):state.orders;
+  const compRows=compareKey?state.orders.filter(o=>monthKey(o.date)===compareKey):null;
+  const s=summary(rows), cs=compRows?summary(compRows):null;
+  document.querySelector("#kExec").textContent=s.pct+"%";
+  document.querySelector("#kExecSub").innerHTML=`${s.exec} de ${s.total} confirmadas${cs?` • ${deltaHTML(s.pct,cs.pct,false," p.p.")}`:""}`;
+  document.querySelector("#kTotal").textContent=s.total;
+  document.querySelector("#kTotalSub").innerHTML=cs?`${monthLabel(selected)} • ${deltaHTML(s.total,cs.total,false,"")}`:(selected?monthLabel(selected):"base completa");
+  document.querySelector("#kPending").textContent=s.pending;
+  document.querySelector("#kPendingSub").innerHTML=cs?`sem CONF • ${deltaHTML(s.pending,cs.pending,true,"")}`:"sem CONF no SAP";
+  document.querySelector("#kLate").textContent=s.late;
+  document.querySelector("#kLateSub").innerHTML=cs?`vencidas • ${deltaHTML(s.late,cs.late,true,"")}`:"data vencida e sem CONF";
+  document.querySelector("#kNoOwner").textContent=s.noOwner;document.querySelector("#kCritical").textContent=s.crit;
+  document.querySelector("#lastUpdate").textContent=state.lastUpdate||"Sem importação";
+
+  const cells=[1,2,3,0].map(c=>({c,s:summary(rows.filter(o=>o.cell===c))})).filter(x=>x.s.total);
+  document.querySelector("#cellBars").innerHTML=cells.length?cells.map(x=>barHTML(cellLabel(x.c),x.s.pct,`${x.s.exec}/${x.s.total}`)).join(""):'<div class="empty">Sem dados.</div>';
+
+  const machineMap={};for(const o of rows)(machineMap[o.equipment]??=[]).push(o);
+  const machines=Object.entries(machineMap).map(([name,r])=>({name,s:summary(r)})).sort((a,b)=>a.s.pct-b.s.pct||b.s.total-a.s.total).slice(0,8);
+  document.querySelector("#machineBars").innerHTML=machines.length?machines.map(x=>barHTML(x.name,x.s.pct,`${x.s.pct}%`)).join(""):'<div class="empty">Sem dados.</div>';
+
+  document.querySelector("#alerts").innerHTML=`
+    <div class="alert red"><div><strong>Ordens atrasadas</strong><br><small>Vencidas e sem CONF</small></div><div class="n">${s.late}</div></div>
+    <div class="alert yellow"><div><strong>Críticas pendentes</strong><br><small>Tipos 300, 302 e 306</small></div><div class="n">${s.crit}</div></div>
+    <div class="alert blue"><div><strong>Sem responsável</strong><br><small>Equipamento ainda não mapeado</small></div><div class="n">${s.noOwner}</div></div>`;
+
+  const opRows=OPERATORS.map(op=>{const r=rows.filter(o=>o.owner===op.name),sm=summary(r);return {...op,...sm};}).filter(x=>x.total).sort((a,b)=>b.late-a.late||b.pending-a.pending||a.pct-b.pct).slice(0,12);
+  document.querySelector("#operatorDebt").innerHTML=opRows.length?opRows.map(x=>`<tr><td>${esc(x.name)}</td><td>${groupBadge(x.group)}</td><td>${x.total}</td><td>${x.exec}</td><td>${x.late}</td><td><b>${x.pct}%</b></td></tr>`).join(""):'<tr><td colspan="6" class="empty">Sem dados.</td></tr>';
+
+  const critical=rows.filter(o=>isCritical(o.type)&&!isConfirmed(o.sap)).sort((a,b)=>(parseBRDate(a.date)||0)-(parseBRDate(b.date)||0));
+  document.querySelector("#criticalTable").innerHTML=critical.length?critical.slice(0,20).map(o=>`<tr><td class="code">${esc(o.order)}</td><td>${esc(o.date)}</td><td>${esc(o.equipment)}</td><td>${esc(o.desc)}</td><td>${esc(o.owner||"—")}</td><td>${statusBadge(o)}</td></tr>`).join(""):'<tr><td colspan="6" class="empty">Nenhuma atividade crítica pendente.</td></tr>';
+}
+function barHTML(label,pct,right){return `<div class="bar-row"><div class="bar-label" title="${esc(label)}">${esc(label)}</div><div class="bar"><i style="width:${Math.max(0,Math.min(100,pct))}%"></i></div><div class="bar-val">${esc(right)}</div></div>`}
+function groupBadge(g){const cls=GROUPS[g]?.color||"gray";return `<span class="badge ${cls}">${esc(g)}</span>`}
+
+function renderProgramacao(){
+  const q=norm(document.querySelector("#fSearch")?.value||"");
+  const month=document.querySelector("#fMonth")?.value||"", cell=document.querySelector("#fCell")?.value||"", st=document.querySelector("#fStatus")?.value||"", group=document.querySelector("#fGroup")?.value||"";
+  let rows=state.orders.filter(o=>{
+    const txt=norm([o.order,o.equipment,o.desc,o.owner,o.loc].join(" "));
+    return (!q||txt.includes(q)) && (!month||monthKey(o.date)===month) && (!cell||String(o.cell)===cell) && (!st||statusOf(o)===st) && (!group||o.group===group);
+  }).sort((a,b)=>(parseBRDate(a.date)||0)-(parseBRDate(b.date)||0)||a.equipment.localeCompare(b.equipment));
+  document.querySelector("#programTable").innerHTML=rows.length?rows.map(o=>`<tr>
+    <td class="code">${esc(o.order)}</td><td>${esc(o.date)}</td><td>${esc(weekKey(o.date))}</td><td>${esc(o.equipment)}</td>
+    <td>${esc(cellLabel(o.cell))}</td><td>${groupBadge(o.group)}</td><td>${esc(o.owner||"—")}</td><td>${esc(o.type)}</td>
+    <td>${esc(o.desc)}</td><td>${statusBadge(o)}</td></tr>`).join(""):'<tr><td colspan="10" class="empty">Nenhuma ordem encontrada.</td></tr>';
+}
+
+function renderMinhaSelectors(){
+  const opSel=document.querySelector("#myOperator"); const current=opSel.value;
+  const selectable=activeOperators(); opSel.innerHTML=selectable.map(o=>`<option value="${esc(o.name)}">${esc(o.name)} • ${esc(o.shift)} • ${esc(o.group)}</option>`).join("");
+  if(current && selectable.some(o=>o.name===current))opSel.value=current;
+  else{
+    const me=selectable.find(o=>o.name.includes("GUILHERME APARECIDO"));
+    if(me)opSel.value=me.name;
+  }
+  const weeks=[...new Set(state.orders.map(o=>weekKey(o.date)).filter(Boolean))].sort((a,b)=>parseBRDate(a.split("–")[0])-parseBRDate(b.split("–")[0]));
+  const wSel=document.querySelector("#myWeek"); const cw=wSel.value;
+  wSel.innerHTML='<option value="">Todas as semanas</option>'+weeks.map(w=>`<option value="${esc(w)}">${esc(w)}</option>`).join("");
+  if(weeks.includes(cw))wSel.value=cw;
+}
+function renderMinhaSemana(){
+  const op=document.querySelector("#myOperator").value, wk=document.querySelector("#myWeek").value;
+  const rows=state.orders.filter(o=>o.owner===op && (!wk||weekKey(o.date)===wk)).sort((a,b)=>(parseBRDate(a.date)||0)-(parseBRDate(b.date)||0));
+  const s=summary(rows);document.querySelector("#myTotal").textContent=s.total;document.querySelector("#myExec").textContent=s.exec;
+  document.querySelector("#myPending").textContent=s.pending;document.querySelector("#myLate").textContent=s.late;
+  document.querySelector("#myCards").innerHTML=rows.length?rows.map(o=>`<div class="order-card">
+    <div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><span class="code">${esc(o.order)}</span>${statusBadge(o)}</div>
+    <h4>${esc(o.equipment)}</h4><div class="desc">${esc(o.desc)}</div>
+    <footer><span>Data: <b>${esc(o.date)}</b></span><span>Tipo: <b>${esc(o.type)}</b></span></footer>
+  </div>`).join(""):'<div class="card empty" style="grid-column:1/-1">Nenhuma atividade para este filtro.</div>';
+}
+
+function renderOperatorPerformance(){
+  const month=document.querySelector("#perfMonth")?.value||"", shift=document.querySelector("#perfShift")?.value||"", group=document.querySelector("#perfGroup")?.value||"", opStatus=document.querySelector("#perfStatus")?.value||"", sort=document.querySelector("#perfSort")?.value||"late";
+  const monthRows=month?state.orders.filter(o=>monthKey(o.date)===month):state.orders;
+  document.querySelector("#perfPeriodLabel").textContent=month?monthLabel(month):"Histórico completo";
+  let cards=OPERATORS.filter(op=>(!shift||op.shift===shift)&&(!group||op.group===group)&&(!opStatus||op.status===opStatus)).map(op=>{
+    const rows=monthRows.filter(o=>o.owner===op.name), s=summary(rows);
+    return {...op,...s};
+  });
+  if(sort==="exec")cards.sort((a,b)=>b.exec-a.exec||b.total-a.total||a.name.localeCompare(b.name));
+  else if(sort==="pct")cards.sort((a,b)=>b.pct-a.pct||b.exec-a.exec||a.name.localeCompare(b.name));
+  else if(sort==="name")cards.sort((a,b)=>a.name.localeCompare(b.name));
+  else cards.sort((a,b)=>b.late-a.late||b.pending-a.pending||a.pct-b.pct||a.name.localeCompare(b.name));
+  const grid=document.querySelector("#performanceOperatorGrid");
+  grid.innerHTML=cards.length?cards.map(op=>`<div class="operator-card performance-card ${op.late?"has-late":""}">
+    <div class="performance-head"><div><div class="performance-name">${esc(op.name)}</div><div class="performance-status">${groupBadge(op.group)} ${statusPill(op.status)} <span class="badge gray">${esc(op.shift)}</span></div></div><button class="mini-btn" onclick="openOperatorOrders('${encodeURIComponent(op.name)}')">Ver ordens</button></div>
+    <div class="operator-stats">
+      <div class="operator-stat"><span class="n">${op.total}</span><span class="l">Programadas</span></div>
+      <div class="operator-stat exec"><span class="n">${op.exec}</span><span class="l">Executadas</span></div>
+      <div class="operator-stat pending"><span class="n">${op.pending}</span><span class="l">Pendentes</span></div>
+      <div class="operator-stat late"><span class="n">${op.late}</span><span class="l">Atrasadas</span></div>
+    </div>
+    <div class="performance-foot"><div class="performance-progress"><small>Aderência de execução</small><div class="bar"><i style="width:${op.pct}%"></i></div></div><div class="execution-ring">${op.pct}%<small>execução</small></div></div>
+  </div>`).join(""):'<div class="card empty" style="grid-column:1/-1">Nenhum operador para este filtro.</div>';
+}
+function openOperatorOrders(encodedName){
+  const name=decodeURIComponent(encodedName);
+  const tab=document.querySelector('.tab[data-page="minha"]');
+  if(tab)tab.click();
+  const sel=document.querySelector("#myOperator");
+  if(sel && [...sel.options].some(o=>o.value===name)){sel.value=name;document.querySelector("#myWeek").value="";renderMinhaSemana();}
+}
+
+function statusPill(status){return status==="Ativo"?'<span class="status-pill active">● Ativo</span>':status==="Férias"?'<span class="status-pill vacation">● Férias</span>':`<span class="status-pill other">${esc(status)}</span>`;}
+function operatorSelect(name,field,value,options){return `<select class="inline-select" onchange="setOperatorField('${encodeURIComponent(name)}','${field}',this.value)">${options.map(x=>`<option value="${esc(x)}" ${x===value?"selected":""}>${esc(x)}</option>`).join("")}</select>`;}
+function setOperatorField(encodedName,field,value){
+  const name=decodeURIComponent(encodedName),op=operatorByName(name);if(!op)return;
+  if(field==="group" && GROUPS[value]){op.group=value;op.cell=GROUPS[value].cell;}
+  if(field==="shift")op.shift=value;
+  if(field==="status")op.status=value;
+  state.lastUpdate=`Base Operacional atualizada • ${new Date().toLocaleString("pt-BR")}`;
+  rebalanceAssignments();persist();renderAll();
+}
+function addOperator(){
+  const name=(document.querySelector("#newOpName").value||"").trim().toUpperCase();
+  if(!name){alert("Informe o nome do operador.");return;}if(operatorByName(name)){alert("Esse operador já está cadastrado.");return;}
+  const shift=document.querySelector("#newOpShift").value,group=document.querySelector("#newOpGroup").value,status=document.querySelector("#newOpStatus").value;
+  OPERATORS.push({name,shift,group,status,cell:GROUPS[group].cell});document.querySelector("#newOpName").value="";
+  state.lastUpdate=`Operador adicionado • ${new Date().toLocaleString("pt-BR")}`;persist();renderAll();
+}
+function renderOperationalBase(){
+  document.querySelector("#opActive").textContent=OPERATORS.filter(o=>o.status==="Ativo").length;
+  document.querySelector("#opVacation").textContent=OPERATORS.filter(o=>o.status==="Férias").length;
+  document.querySelector("#opNoShift").textContent=OPERATORS.filter(o=>o.shift==="A definir").length;
+  document.querySelector("#opTotal").textContent=OPERATORS.length;
+  const shift=document.querySelector("#opShiftFilter")?.value||"",group=document.querySelector("#opGroupFilter")?.value||"",status=document.querySelector("#opStatusFilter")?.value||"",q=norm(document.querySelector("#opSearch")?.value||"");
+  const rows=OPERATORS.filter(o=>(!shift||o.shift===shift)&&(!group||o.group===group)&&(!status||o.status===status)&&(!q||norm(o.name).includes(q))).sort((a,b)=>a.shift.localeCompare(b.shift)||a.group.localeCompare(b.group)||a.name.localeCompare(b.name));
+  const shifts=["1º Turno","2º Turno","3º Turno","A definir"],groups=["Frente","LGF","Meio","Fundo"],statuses=["Ativo","Férias"];
+  document.querySelector("#operatorBaseTable").innerHTML=rows.length?rows.map(op=>{const s=summary(state.orders.filter(o=>o.owner===op.name));return `<tr><td><b>${esc(op.name)}</b></td><td>${operatorSelect(op.name,"shift",op.shift,shifts)}</td><td>${operatorSelect(op.name,"group",op.group,groups)}</td><td>${cellLabel(op.cell)}</td><td>${operatorSelect(op.name,"status",op.status,statuses)}<div style="margin-top:5px">${statusPill(op.status)}</div></td><td>${s.total}</td><td><b>${s.pct}%</b></td></tr>`;}).join(""):'<tr><td colspan="7" class="empty">Nenhum operador encontrado.</td></tr>';
+}
+
+function renderMachineMap(){
+  const groups=[
+    {g:"Frente",title:"Célula 1 • Frente",machines:["Enchedora 01","Enchedora 02","Inspetores","Transporte UIP ↔ ECH"]},
+    {g:"LGF",title:"Célula 1 • LGF",machines:["LGF"]},
+    {g:"Meio",title:"Célula 2 • Meio",machines:["Pasteurizador","Rotuladora 01","Rotuladora 02","Magazine de caixas"]},
+    {g:"Fundo",title:"Célula 3 • Fundo",machines:["Paletizadora 01 (garrafeira)","Paletizadora 02 (cartão)","Despaletizadoras 01 e 02","Encaixotadora","Desencaixotadora","Empacotadora","Envolvedora","Cintadora"]}
+  ];
+  document.querySelector("#machineMap").innerHTML=groups.map(x=>`<div class="machine-group"><div style="display:flex;justify-content:space-between;gap:8px"><h4>${esc(x.title)}</h4>${groupBadge(x.g)}</div><small>${activeOperators().filter(o=>o.group===x.g).length} operadores ativos</small><ul class="machine-list">${x.machines.map(m=>`<li>${esc(m)}</li>`).join("")}</ul></div>`).join("");
+
+  const machines=[...new Set([...Object.keys(MACHINE_CATALOG),...state.orders.map(o=>o.equipment)])].sort();
+  document.querySelector("#machineConfig").innerHTML=machines.map(eq=>{
+    const g=groupForEquipment(eq), c=GROUPS[g].cell;
+    return `<tr><td>${esc(eq)}</td><td><select class="inline-select" onchange="setMachineGroup('${esc(eq).replace(/'/g,"&#039;")}',this.value)">
+      ${["Frente","LGF","Meio","Fundo","A definir"].map(x=>`<option ${x===g?"selected":""}>${x}</option>`).join("")}</select></td><td>${esc(cellLabel(c))}</td></tr>`;
+  }).join("");
+}
+function renderHistory(){
+  const months=availableMonths();const total=summary(state.orders);
+  document.querySelector("#hMonths").textContent=months.length;document.querySelector("#hOrders").textContent=total.total;document.querySelector("#hExec").textContent=total.exec;document.querySelector("#hBacklog").textContent=total.pending;
+  const monthly=months.map(k=>({key:k,s:summary(state.orders.filter(o=>monthKey(o.date)===k))}));
+  document.querySelector("#historyBars").innerHTML=monthly.length?monthly.map(x=>`<div class="history-row"><div class="history-label">${monthLabel(x.key).replace(/ de /g,"/")}</div><div class="bar"><i style="width:${x.s.pct}%"></i></div><div class="history-meta">${x.s.exec}/${x.s.total}</div><div class="bar-val">${x.s.pct}%</div></div>`).join(""):'<div class="empty">Sem meses disponíveis.</div>';
+  document.querySelector("#monthHistoryTable").innerHTML=monthly.length?[...monthly].reverse().map(x=>`<tr><td><b>${monthLabel(x.key)}</b></td><td>${x.s.total}</td><td>${x.s.exec}</td><td>${x.s.pending}</td><td>${x.s.late}</td><td><b>${x.s.pct}%</b></td></tr>`).join(""):'<tr><td colspan="6" class="empty">Sem histórico.</td></tr>';
+  const hist=[...(state.importHistory||[])].reverse().slice(0,20);
+  document.querySelector("#importHistoryTable").innerHTML=hist.length?hist.map(h=>`<tr><td>${esc(new Date(h.at).toLocaleString("pt-BR"))}</td><td>${h.read||0}</td><td>${h.created||0}</td><td>${h.updated||0}</td><td>${h.newlyConfirmed||0}</td></tr>`).join(""):'<tr><td colspan="5" class="empty">As próximas importações aparecerão aqui.</td></tr>';
+}
+
+function setMachineGroup(eq,g){
+  state.overrides[eq]=g; rebalanceAssignments(); state.lastUpdate="Mapeamento ajustado em "+new Date().toLocaleString("pt-BR"); persist(); renderAll();
+}
+
+function detectDelimiter(text){
+  const first=(text.split(/\r?\n/)[0]||"");
+  const tabs=(first.match(/\t/g)||[]).length, semi=(first.match(/;/g)||[]).length;
+  return tabs>=semi?"\t":";";
+}
+function headerIndex(headers,aliases){
+  const H=headers.map(norm);
+  for(const a of aliases){const i=H.findIndex(h=>h===norm(a)||h.includes(norm(a))); if(i>=0)return i}
+  return -1;
+}
+function normalizeSapDate(s){
+  s=(s||"").trim();
+  let m=s.match(/^(\d{1,2})[.\/-](\d{1,2})[.\/-](\d{4})$/);
+  if(!m)return s;
+  return `${String(m[1]).padStart(2,"0")}/${String(m[2]).padStart(2,"0")}/${m[3]}`;
+}
+function parsePasted(text){
+  text=(text||"").trim(); if(!text)return [];
+  const delim=detectDelimiter(text);
+  const lines=text.split(/\r?\n/).filter(x=>x.trim());
+  if(lines.length<2)return [];
+  const headers=lines[0].split(delim).map(x=>x.trim());
+  const idx={
+    order:headerIndex(headers,["Ordem","N°Ordem","Nº Ordem"]),
+    date:headerIndex(headers,["InícioBase","InicioBase","Data-base iníc.","Data-base inic","Data de início da ordem","Data de Inic","Data início"]),
+    desc:headerIndex(headers,["Texto breve","TxtDesc.Oper.","Descrição Operacional","Texto Descrição"]),
+    orderType:headerIndex(headers,["Tp.","Tipo de ordem","Tipo ordem"]),
+    workCenter:headerIndex(headers,["CenTrabPr.","Centro de trabalho","CentroTrab"]),
+    userStatus:headerIndex(headers,["StatUsuár.","Status usuário","Status usuario"]),
+    loc:headerIndex(headers,["Loc.instalação","Loc.instalacao","Local de instalação"]),
+    type:headerIndex(headers,["TAM","Tip.ativ.manut.","Tp.atvd","Tipo atividade","Tipo.atividade"]),
+    sap:headerIndex(headers,["Status sistema","Status"]),
+    equipment:headerIndex(headers,["EQUIP","Equipamento"])
+  };
+  if(idx.order<0)throw new Error("Não encontrei a coluna 'Ordem'. Inclua os cabeçalhos ao copiar do Excel.");
+  return lines.slice(1).map(line=>{
+    const c=line.split(delim);
+    return {
+      order:c[idx.order]?.trim(), orderType:idx.orderType>=0?c[idx.orderType]?.trim():"",
+      date:idx.date>=0?normalizeSapDate(c[idx.date]?.trim()):"",
+      desc:idx.desc>=0?c[idx.desc]?.trim():"", loc:idx.loc>=0?c[idx.loc]?.trim():"",
+      workCenter:idx.workCenter>=0?c[idx.workCenter]?.trim():"",
+      type:idx.type>=0?c[idx.type]?.trim():"", userStatus:idx.userStatus>=0?c[idx.userStatus]?.trim():"",
+      sap:idx.sap>=0?c[idx.sap]?.trim():"", equipment:idx.equipment>=0?c[idx.equipment]?.trim():""
+    }
+  }).filter(x=>x.order);
+}
+function parseSapHtml(htmlText){
+  const doc=new DOMParser().parseFromString(htmlText,"text/html");
+  const tables=[...doc.querySelectorAll("table")];
+  if(!tables.length)throw new Error("Nenhuma tabela encontrada no arquivo HTM/HTML.");
+  let best=null,bestScore=-1;
+  for(const table of tables){
+    const rows=[...table.querySelectorAll("tr")];
+    if(!rows.length)continue;
+    const first=[...rows[0].querySelectorAll("th,td")].map(c=>c.textContent.replace(/\u00a0/g," ").trim());
+    const score=["Ordem","Tp.","InícioBase","Texto breve","Local de instalação","TAM","Status do sistema"].filter(a=>headerIndex(first,[a])>=0).length;
+    if(score>bestScore){bestScore=score;best={table,rows,headers:first};}
+  }
+  if(!best || headerIndex(best.headers,["Ordem"])<0)throw new Error("Não encontrei a tabela de ordens SAP.");
+  const headers=best.headers;
+  const idx={
+    order:headerIndex(headers,["Ordem","N°Ordem","Nº Ordem"]),
+    orderType:headerIndex(headers,["Tp.","Tipo de ordem","Tipo ordem"]),
+    date:headerIndex(headers,["InícioBase","InicioBase","Data-base iníc.","Data-base inic"]),
+    desc:headerIndex(headers,["Texto breve","TxtDesc.Oper.","Descrição Operacional"]),
+    loc:headerIndex(headers,["Local de instalação","Loc.instalação","Loc.instalacao"]),
+    workCenter:headerIndex(headers,["CenTrabPr.","Centro de trabalho"]),
+    type:headerIndex(headers,["TAM","Tip.ativ.manut.","Tp.atvd"]),
+    userStatus:headerIndex(headers,["StatUsuár.","Status usuário","Status usuario"]),
+    sap:headerIndex(headers,["Status do sistema","Status sistema","Status"])
+  };
+  return best.rows.slice(1).map(tr=>{
+    const c=[...tr.querySelectorAll("td,th")].map(x=>x.textContent.replace(/\u00a0/g," ").trim());
+    return {
+      order:c[idx.order]||"", orderType:idx.orderType>=0?(c[idx.orderType]||""):"",
+      date:idx.date>=0?normalizeSapDate(c[idx.date]||""):"", desc:idx.desc>=0?(c[idx.desc]||""):"",
+      loc:idx.loc>=0?(c[idx.loc]||""):"", workCenter:idx.workCenter>=0?(c[idx.workCenter]||""):"",
+      type:idx.type>=0?(c[idx.type]||""):"", userStatus:idx.userStatus>=0?(c[idx.userStatus]||""):"",
+      sap:idx.sap>=0?(c[idx.sap]||""):""
+    };
+  }).filter(x=>/^\d{6,}$/.test(x.order));
+}
+function renderImportPreview(rows,label){
+  const shown=rows.slice(0,30).map(x=>hydrateOrder(x));
+  document.querySelector("#previewTable").innerHTML=shown.length?shown.map(o=>`<tr><td class="code">${esc(o.order)}</td><td>${esc(o.date)}</td><td>${esc(o.equipment)}</td><td>${esc(o.type)}</td><td>${esc(o.desc)}</td><td class="code">${esc(o.sap)}</td></tr>`).join(""):'<tr><td colspan="6" class="empty">Nenhum dado.</td></tr>';
+  document.querySelector("#importResult").textContent=`${label}: ${rows.length} ordens encontradas • mostrando ${shown.length}.`;
+}
+function upsertImportedRows(rows,sourceLabel){
+  if(!rows.length)throw new Error("Nenhuma ordem válida encontrada.");
+  const map=new Map(state.orders.map(o=>[String(o.order),o]));
+  let created=0,updated=0,newlyConfirmed=0;const now=new Date().toISOString();
+  for(const r of rows){
+    const existing=map.get(String(r.order).trim());
+    const wasConfirmed=existing?isConfirmed(existing.sap):false;
+    const obj=hydrateOrder(r,existing);
+    const nowConfirmed=isConfirmed(obj.sap);
+    if(existing){
+      if(!wasConfirmed && nowConfirmed){obj.completedAt=now;newlyConfirmed++;}
+      Object.assign(existing,obj,{owner:existing.owner||obj.owner});updated++;
+    }else{state.orders.push(obj);map.set(obj.order,obj);created++;}
+  }
+  rebalanceAssignments();
+  state.importHistory=state.importHistory||[];state.importHistory.push({at:now,source:sourceLabel,read:rows.length,created,updated,newlyConfirmed});
+  if(state.importHistory.length>100)state.importHistory=state.importHistory.slice(-100);
+  state.lastUpdate=`${sourceLabel} • ${new Date().toLocaleString("pt-BR")} • ${created} novas • ${updated} atualizadas`;
+  persist(); renderAll();
+  document.querySelector("#importResult").innerHTML=`<span class="badge green">${created} novas</span> <span class="badge blue">${updated} atualizadas</span> <span class="badge yellow">${newlyConfirmed} CONF detectadas</span> <span class="badge gray">${rows.length} ordens lidas</span>`;
+}
+async function getSapHtmlRows(){
+  const input=document.querySelector("#sapHtmlFile"), file=input.files?.[0];
+  if(!file)throw new Error("Selecione primeiro o arquivo .htm ou .html exportado pelo SAP.");
+  const html=await file.text();
+  return parseSapHtml(html);
+}
+async function previewSapHtmlFile(){
+  try{const rows=await getSapHtmlRows(); renderImportPreview(rows,"Arquivo SAP");}
+  catch(e){document.querySelector("#importResult").textContent="Erro: "+e.message;}
+}
+async function importSapHtmlFile(){
+  try{const rows=await getSapHtmlRows(); upsertImportedRows(rows,"SAP HTM atualizado");}
+  catch(e){document.querySelector("#importResult").textContent="Erro: "+e.message;}
+}
+
+function previewPaste(){
+  try{
+    const rows=parsePasted(document.querySelector("#pasteArea").value);
+    renderImportPreview(rows,"Dados colados");
+  }catch(e){document.querySelector("#importResult").textContent="Erro: "+e.message}
+}
+function importFromPaste(){
+  try{
+    const rows=parsePasted(document.querySelector("#pasteArea").value);
+    upsertImportedRows(rows,"SAP/Excel atualizado");
+  }catch(e){document.querySelector("#importResult").textContent="Erro: "+e.message}
+}
+
+function renderAll(){
+  rebalanceAssignments();
+  renderMonthSelectors();
+  renderDashboard();renderProgramacao();renderMinhaSelectors();renderMinhaSemana();renderOperatorPerformance();renderOperationalBase();renderMachineMap();renderHistory();
+}
+document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));t.classList.add("active");
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));document.querySelector("#"+t.dataset.page).classList.add("active");
+}));
+if(!state.orders.length){
+  loadDemo(true);
+  localStorage.setItem("po504_embeddedBaseVersion",EMBEDDED_BASE_VERSION);
+}else{
+  syncEmbeddedBase();
+  renderAll();
+}
+</script>
+</body>
+</html>
